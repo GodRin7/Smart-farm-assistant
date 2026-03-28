@@ -10,6 +10,7 @@ import AddCrop from "../pages/AddCrop";
 import EditCrop from "../pages/EditCrop";
 import CropDetails from "../pages/CropDetails";
 import ProtectedRoute from "../components/ProtectedRoute";
+import AddExpense from "../pages/AddExpense";
 
 function Router() {
   return (
@@ -70,9 +71,17 @@ function Router() {
             <ProtectedRoute>
               <Expenses />
             </ProtectedRoute>
+            
           }
         />
-
+<Route
+  path="/expenses/add"
+  element={
+    <ProtectedRoute>
+      <AddExpense />
+    </ProtectedRoute>
+  }
+/>
         <Route
           path="/activities"
           element={
