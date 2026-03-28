@@ -6,6 +6,9 @@ import Crops from "../pages/Crops";
 import Expenses from "../pages/Expenses";
 import Activities from "../pages/Activities";
 import Profile from "../pages/Profile";
+import AddCrop from "../pages/AddCrop";
+import EditCrop from "../pages/EditCrop";
+import CropDetails from "../pages/CropDetails";
 import ProtectedRoute from "../components/ProtectedRoute";
 
 function Router() {
@@ -30,6 +33,33 @@ function Router() {
           element={
             <ProtectedRoute>
               <Crops />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/crops/add"
+          element={
+            <ProtectedRoute>
+              <AddCrop />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/crops/:id"
+          element={
+            <ProtectedRoute>
+              <CropDetails />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/crops/:id/edit"
+          element={
+            <ProtectedRoute>
+              <EditCrop />
             </ProtectedRoute>
           }
         />
