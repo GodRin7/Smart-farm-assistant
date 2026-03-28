@@ -4,8 +4,8 @@ import { Home, Sprout, Wallet, ClipboardList, User } from "lucide-react";
 const navItems = [
   { name: "Home", path: "/dashboard", icon: Home },
   { name: "Crops", path: "/crops", icon: Sprout },
+  { name: "Harvests", path: "/harvests", icon: ClipboardList },
   { name: "Expenses", path: "/expenses", icon: Wallet },
-  { name: "Activities", path: "/activities", icon: ClipboardList },
   { name: "Profile", path: "/profile", icon: User },
 ];
 

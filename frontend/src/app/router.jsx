@@ -12,6 +12,8 @@ import CropDetails from "../pages/CropDetails";
 import ProtectedRoute from "../components/ProtectedRoute";
 import AddExpense from "../pages/AddExpense";
 import AddActivity from "../pages/AddActivity";
+import Harvests from "../pages/Harvests";
+import AddHarvest from "../pages/AddHarvest";
 
 function Router() {
   return (
@@ -96,6 +98,23 @@ function Router() {
   element={
     <ProtectedRoute>
       <AddActivity />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/harvests"
+  element={
+    <ProtectedRoute>
+      <Harvests />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/harvests/add"
+  element={
+    <ProtectedRoute>
+      <AddHarvest />
     </ProtectedRoute>
   }
 />
