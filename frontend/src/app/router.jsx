@@ -11,6 +11,7 @@ import EditCrop from "../pages/EditCrop";
 import CropDetails from "../pages/CropDetails";
 import ProtectedRoute from "../components/ProtectedRoute";
 import AddExpense from "../pages/AddExpense";
+import AddActivity from "../pages/AddActivity";
 
 function Router() {
   return (
@@ -90,6 +91,14 @@ function Router() {
             </ProtectedRoute>
           }
         />
+        <Route
+  path="/activities/add"
+  element={
+    <ProtectedRoute>
+      <AddActivity />
+    </ProtectedRoute>
+  }
+/>
 
         <Route
           path="/profile"
