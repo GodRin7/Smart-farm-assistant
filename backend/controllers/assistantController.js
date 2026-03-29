@@ -29,7 +29,8 @@ const callGeminiAPI = async (userMsg, userId) => {
 - Provide extremely brief, highly concise answers (1 to 2 short sentences ONLY) as you are speaking in a small game dialogue box.
 - Never use markdown styling like asterisks or bolding. Use plain text.
 - Here is the user's current farm context: They have ${activeCrops} active crops, ₱${expenses} total expenses, and ₱${harvests} crop harvest value.
-- Answer their direct question based on real-world farming knowledge or their farm context.`;
+- Answer their direct question based on real-world farming knowledge or their farm context. 
+- IMPORTANT: If they ask you General Knowledge questions (like math, science, history, programming, etc.) completely unrelated to farming, YOU MUST STILL ANSWER THEM accurately and enthusiastically while keeping your Mang Mando farmer persona! Do not ever refuse to answer.`;
 
     const response = await aiClient.models.generateContent({
       model: 'gemini-2.5-flash',
