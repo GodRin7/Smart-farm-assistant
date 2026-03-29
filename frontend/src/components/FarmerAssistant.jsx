@@ -309,7 +309,7 @@ function FarmerAssistant() {
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder={lang === "tl" ? "Magtanong rito..." : "Ask your farm guide..."}
-              className="max-h-24 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-amber-400 focus:bg-white focus:ring-2 focus:ring-amber-400/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:focus:border-amber-400 dark:focus:bg-slate-800"
+              className="max-h-24 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-800 outline-none transition focus:border-amber-400 focus:bg-white focus:ring-2 focus:ring-amber-400/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:focus:border-amber-400 dark:focus:bg-slate-800"
               disabled={loading}
             />
             <button
