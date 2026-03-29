@@ -2,10 +2,13 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import MobileLayout from "../components/MobileLayout";
 import { getCropById, updateCrop } from "../api/cropApi";
+import { useTranslation } from "../context/TranslationContext";
+import { RefreshCw } from "lucide-react";
 
 function EditCrop() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [formData, setFormData] = useState({
     cropName: "",
@@ -44,7 +47,7 @@ function EditCrop() {
           notes: crop.notes || "",
         });
       } catch (error) {
-        setError("Failed to load crop");
+        setError(t("failedToLoad"));
       } finally {
         setLoading(false);
       }
@@ -75,7 +78,7 @@ function EditCrop() {
 
       navigate(`/crops/${id}`);
     } catch (error) {
-      setError(error.response?.data?.message || "Failed to update crop");
+      setError(error.response?.data?.message || t("error"));
     } finally {
       setSaving(false);
     }
@@ -83,139 +86,163 @@ function EditCrop() {
 
   if (loading) {
     return (
-      <MobileLayout title="Edit Crop">
-        <div className="rounded-3xl bg-white p-4 shadow-sm dark:bg-slate-900">Loading crop...</div>
+      <MobileLayout title={t("editCrop")}>
+        <div className="flex h-40 flex-col items-center justify-center space-y-4 rounded-[2rem] bg-white/50 backdrop-blur-xl shadow-sm dark:bg-[#0f172a]/50 border border-white/20 dark:border-slate-800/50">
+          <RefreshCw className="h-8 w-8 animate-spin text-emerald-500" />
+        </div>
       </MobileLayout>
     );
   }
 
   return (
-    <MobileLayout title="Edit Crop">
+    <MobileLayout title={t("editCrop")}>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="rounded-3xl bg-white p-4 shadow-sm dark:bg-slate-900">
-          <div className="space-y-4">
+        <div className="overflow-hidden rounded-[2rem] border border-white/40 bg-white/70 p-6 shadow-sm backdrop-blur-xl dark:border-slate-800/50 dark:bg-slate-900/50">
+          <div className="space-y-5">
             <div>
-              <label className="mb-2 block text-sm font-medium">Crop Name</label>
+              <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                {t("cropNameLabel")}
+              </label>
               <input
                 type="text"
                 name="cropName"
                 value={formData.cropName}
                 onChange={handleChange}
-                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                className="w-full rounded-2xl border border-white/60 bg-white/50 px-4 py-3 text-base text-slate-900 shadow-sm outline-none backdrop-blur-sm transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700/60 dark:bg-slate-800/50 dark:text-slate-100 dark:focus:border-emerald-500 dark:focus:bg-slate-800"
                 required
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">Variety</label>
+              <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                {t("variety")}
+              </label>
               <input
                 type="text"
                 name="variety"
                 value={formData.variety}
                 onChange={handleChange}
-                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                className="w-full rounded-2xl border border-white/60 bg-white/50 px-4 py-3 text-base text-slate-900 shadow-sm outline-none backdrop-blur-sm transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700/60 dark:bg-slate-800/50 dark:text-slate-100 dark:focus:border-emerald-500 dark:focus:bg-slate-800"
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">Plot Name</label>
+              <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                {t("plotName")}
+              </label>
               <input
                 type="text"
                 name="plotName"
                 value={formData.plotName}
                 onChange={handleChange}
-                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                className="w-full rounded-2xl border border-white/60 bg-white/50 px-4 py-3 text-base text-slate-900 shadow-sm outline-none backdrop-blur-sm transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700/60 dark:bg-slate-800/50 dark:text-slate-100 dark:focus:border-emerald-500 dark:focus:bg-slate-800"
               />
             </div>
 
-            <div>
-              <label className="mb-2 block text-sm font-medium">Area</label>
-              <input
-                type="number"
-                name="area"
-                value={formData.area}
-                onChange={handleChange}
-                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  {t("area")}
+                </label>
+                <input
+                  type="number"
+                  name="area"
+                  value={formData.area}
+                  onChange={handleChange}
+                  className="w-full rounded-2xl border border-white/60 bg-white/50 px-4 py-3 text-base text-slate-900 shadow-sm outline-none backdrop-blur-sm transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700/60 dark:bg-slate-800/50 dark:text-slate-100 dark:focus:border-emerald-500 dark:focus:bg-slate-800"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  {t("areaUnitLabel")}
+                </label>
+                <select
+                  name="areaUnit"
+                  value={formData.areaUnit}
+                  onChange={handleChange}
+                  className="w-full rounded-2xl border border-white/60 bg-white/50 px-4 py-3 text-base text-slate-900 shadow-sm outline-none backdrop-blur-sm transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700/60 dark:bg-slate-800/50 dark:text-slate-100 dark:focus:border-emerald-500 dark:focus:bg-slate-800"
+                >
+                  <option value="sqm">{t("sqm")}</option>
+                  <option value="hectare">{t("hectare")}</option>
+                </select>
+              </div>
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">Area Unit</label>
-              <select
-                name="areaUnit"
-                value={formData.areaUnit}
-                onChange={handleChange}
-                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-              >
-                <option value="sqm">Square Meters</option>
-                <option value="hectare">Hectare</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-medium">Date Planted</label>
+              <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                {t("plantedDate")}
+              </label>
               <input
                 type="date"
                 name="plantedDate"
                 value={formData.plantedDate}
                 onChange={handleChange}
-                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                className="w-full rounded-2xl border border-white/60 bg-white/50 px-4 py-3 text-base text-slate-900 shadow-sm outline-none backdrop-blur-sm transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700/60 dark:bg-slate-800/50 dark:text-slate-100 dark:focus:border-emerald-500 dark:focus:bg-slate-800"
                 required
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">Expected Harvest Date</label>
+              <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                {t("expectedHarvest")}
+              </label>
               <input
                 type="date"
                 name="expectedHarvestDate"
                 value={formData.expectedHarvestDate}
                 onChange={handleChange}
-                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                className="w-full rounded-2xl border border-white/60 bg-white/50 px-4 py-3 text-base text-slate-900 shadow-sm outline-none backdrop-blur-sm transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700/60 dark:bg-slate-800/50 dark:text-slate-100 dark:focus:border-emerald-500 dark:focus:bg-slate-800"
                 required
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">Actual Harvest Date</label>
+              <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                {t("actualHarvestDate")}
+              </label>
               <input
                 type="date"
                 name="actualHarvestDate"
                 value={formData.actualHarvestDate}
                 onChange={handleChange}
-                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                className="w-full rounded-2xl border border-white/60 bg-white/50 px-4 py-3 text-base text-slate-900 shadow-sm outline-none backdrop-blur-sm transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700/60 dark:bg-slate-800/50 dark:text-slate-100 dark:focus:border-emerald-500 dark:focus:bg-slate-800"
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">Status</label>
+              <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                {t("statusLabel")}
+              </label>
               <select
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                className="w-full rounded-2xl border border-white/60 bg-white/50 px-4 py-3 text-base text-slate-900 shadow-sm outline-none backdrop-blur-sm transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700/60 dark:bg-slate-800/50 dark:text-slate-100 dark:focus:border-emerald-500 dark:focus:bg-slate-800"
               >
-                <option value="active">Active</option>
-                <option value="harvested">Harvested</option>
-                <option value="failed">Failed</option>
+                <option value="active">{t("filterActive")}</option>
+                <option value="harvested">{t("filterHarvested")}</option>
+                <option value="failed">{t("filterFailed")}</option>
               </select>
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">Notes</label>
+              <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                {t("notesLabel")}
+              </label>
               <textarea
                 name="notes"
                 value={formData.notes}
                 onChange={handleChange}
                 rows="4"
-                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                className="w-full rounded-2xl border border-white/60 bg-white/50 px-4 py-3 text-base text-slate-900 shadow-sm outline-none backdrop-blur-sm transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700/60 dark:bg-slate-800/50 dark:text-slate-100 dark:focus:border-emerald-500 dark:focus:bg-slate-800"
               />
             </div>
           </div>
         </div>
 
         {error && (
-          <div className="rounded-2xl bg-red-100 px-4 py-3 text-sm text-red-700 dark:bg-red-900/30 dark:text-red-300">
+          <div className="rounded-[2rem] border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700 shadow-sm dark:border-red-900/30 dark:bg-red-900/20 dark:text-red-300">
             {error}
           </div>
         )}
@@ -223,9 +250,9 @@ function EditCrop() {
         <button
           type="submit"
           disabled={saving}
-          className="w-full rounded-2xl bg-green-600 px-4 py-3 text-base font-semibold text-white"
+          className="w-full rounded-[2rem] bg-emerald-600 px-4 py-4 text-base font-bold tracking-wide text-white shadow-md shadow-emerald-600/20 transition-all hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-600/30 active:scale-[0.98]"
         >
-          {saving ? "Updating..." : "Update Crop"}
+          {saving ? t("updating") : t("updateCrop")}
         </button>
       </form>
     </MobileLayout>

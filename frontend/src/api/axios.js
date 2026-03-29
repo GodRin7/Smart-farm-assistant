@@ -1,8 +1,17 @@
 import axios from "axios";
+import { setupMockAdapter } from "./mockAdapter";
+
+// Set to true to use mock data (no backend needed).
+// Set to false to use the real backend at http://localhost:5000
+const USE_MOCK = false;
 
 const API = axios.create({
   baseURL: "http://localhost:5000/api",
 });
+
+if (USE_MOCK) {
+  setupMockAdapter(API);
+}
 
 API.interceptors.request.use(
   (config) => {

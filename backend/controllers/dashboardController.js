@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Crop = require("../models/Crop");
 const Expense = require("../models/Expense");
 const Activity = require("../models/Activity");
@@ -8,7 +9,8 @@ const Harvest = require("../models/Harvest");
 // @access  Private
 const getDashboard = async (req, res) => {
   try {
-    const userId = req.user._id;
+    // Cast to ObjectId so aggregation $match works correctly
+    const userId = new mongoose.Types.ObjectId(req.user._id);
     const today = new Date();
     const next14Days = new Date();
     next14Days.setDate(today.getDate() + 14);
@@ -48,6 +50,7 @@ const getDashboard = async (req, res) => {
       .sort({ date: -1, createdAt: -1 })
       .limit(5);
 
+    // Crops with harvest date within next 14 days
     const upcomingHarvests = await Crop.find({
       user: userId,
       status: "active",
@@ -68,8 +71,9 @@ const getDashboard = async (req, res) => {
       upcomingHarvests,
     });
   } catch (error) {
+    console.error("Dashboard error:", error);
     res.status(500).json({ message: "Server error while loading dashboard" });
   }
 };
 
-module.exports = { getDashboard };
+module.exports = { getDashboard };

@@ -2,11 +2,13 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
+import { useTranslation } from "../context/TranslationContext";
 
 function Login() {
   const navigate = useNavigate();
   const { login, loading } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { t } = useTranslation();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -40,9 +42,9 @@ function Login() {
       <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <div className="mb-6 flex items-start justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold">Smart Farm Assistant</h1>
+            <h1 className="text-2xl font-bold">{t("loginTitle")}</h1>
             <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-              Sign in to manage farm records.
+              {t("loginSubtitle")}
             </p>
           </div>
 
@@ -50,19 +52,19 @@ function Login() {
             onClick={toggleTheme}
             className="rounded-xl border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 dark:border-slate-700 dark:text-slate-200"
           >
-            {theme === "light" ? "Dark" : "Light"}
+            {theme === "light" ? t("themeDark") : t("themeLight")}
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-              Email
+              {t("emailAddr")}
             </label>
             <input
               type="email"
               name="email"
-              placeholder="Enter your email"
+              placeholder={t("emailAddr")}
               value={formData.email}
               onChange={handleChange}
               className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 placeholder:text-slate-500 outline-none focus:border-green-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-400"
@@ -71,12 +73,12 @@ function Login() {
 
           <div>
             <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-              Password
+              {t("password")}
             </label>
             <input
               type="password"
               name="password"
-              placeholder="Enter your password"
+              placeholder={t("password")}
               value={formData.password}
               onChange={handleChange}
               className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 placeholder:text-slate-500 outline-none focus:border-green-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-400"
@@ -94,14 +96,14 @@ function Login() {
             disabled={loading}
             className="w-full rounded-2xl bg-green-600 px-4 py-3 text-base font-semibold text-white transition hover:bg-green-700 disabled:opacity-70"
           >
-            {loading ? "Signing in..." : "Login"}
+            {loading ? t("loading") : t("loginBtn")}
           </button>
         </form>
 
         <p className="mt-4 text-sm text-slate-600 dark:text-slate-400">
-          No account yet?{" "}
+          {t("noAccount")}{" "}
           <Link to="/register" className="font-medium text-green-600 dark:text-green-400">
-            Register
+            {t("registerHere")}
           </Link>
         </p>
       </div>

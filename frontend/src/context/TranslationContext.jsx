@@ -1,0 +1,340 @@
+import { createContext, useContext, useCallback } from "react";
+import { useAuth } from "./AuthContext";
+
+const translations = {
+  en: {
+    // Nav & Common
+    langName: "English",
+    dashboard: "Dashboard",
+    crops: "Crops",
+    profile: "Profile",
+    harvests: "Harvests",
+    expenses: "Expenses",
+    activities: "Activities",
+    loading: "Loading...",
+    error: "An error occurred",
+    seeAll: "See all",
+    
+    // Auth
+    loginTitle: "Welcome back!",
+    loginSubtitle: "Sign in to manage your farm",
+    emailAddr: "Email Address",
+    password: "Password",
+    loginBtn: "Login",
+    noAccount: "Don't have an account?",
+    registerHere: "Register here",
+    registerTitle: "Create Account",
+    fullName: "Full Name",
+    haveAccount: "Already have an account?",
+    loginHere: "Login here",
+    syncing: "Syncing farm data...",
+    dashError: "Failed to load layout. Ensure you are logged in.",
+
+    // Dashboard
+    goodMorning: "Good morning",
+    goodAfternoon: "Good afternoon",
+    goodEvening: "Good evening",
+    yourFarm: "Farm Overview",
+    growingNicely: "Everything is growing nicely.",
+    activeCrops: "Active Crops",
+    totalExpenses: "Total Expenses",
+    harvestValue: "Harvest Value",
+    upcomingHarvests: "Soon to Harvest",
+    viewAll: "View All",
+    history: "History",
+    noUpcoming: "No crops nearing harvest.",
+    expected: "Expected",
+    recentActivities: "Recent Activities",
+    noActivities: "No recent activities recorded.",
+    quickCtaLabel: "Plant",
+    quickCtaSub: "New crop",
+
+    // Profile
+    myProfile: "My Profile",
+    accountDetails: "Account Details",
+    nameLabel: "Name",
+    emailLabel: "Email",
+    prefsTitle: "Preferences",
+    langLabel: "Language",
+    themeLabel: "Theme",
+    themeLight: "Light",
+    themeDark: "Dark",
+    themeSystem: "System",
+    logoutBtn: "Logout",
+
+    // Crops
+    myCrops: "My Crops",
+    addCrop: "Add Crop",
+    noCrops: "No crops found. Plant your first crop!",
+    plotName: "Plot",
+    expectedHarvest: "Expected Harvest",
+    plantedDate: "Planted Date",
+    variety: "Variety",
+    area: "Area",
+    statusActive: "Active",
+    statusHarvested: "Harvested",
+
+    // Expenses / Activities / Harvests
+    dateLabel: "Date",
+    amountLabel: "Amount",
+    categoryLabel: "Category",
+    notesLabel: "Notes",
+    addExpense: "Add Expense",
+    myExpenses: "My Expenses",
+    addHarvest: "Add Harvest",
+    myHarvests: "My Harvests",
+    noExpenses: "No expenses recorded.",
+    noHarvests: "No harvests recorded.",
+    addActivity: "Add Activity",
+    myActivities: "My Activities",
+    
+    // Filters & Actions
+    filterAllCrops: "All Crops",
+    filterActive: "Active Growing",
+    filterHarvested: "Harvested",
+    filterFailed: "Failed / Lost",
+    filterCategory: "Filter by category",
+    filterAllActivities: "All Activities",
+    filterActivity: "Filter by activity",
+    filterAllCategories: "All Categories",
+    delete: "Delete",
+    confirmDelete: "Are you sure you want to delete this?",
+    saveCrop: "Save Crop",
+    saveActivity: "Save Activity",
+    saveHarvest: "Save Harvest",
+    saveExpense: "Save Expense",
+    saving: "Saving...",
+    cancel: "Cancel",
+
+    // Empty & Loading states
+    loadingCrops: "Loading crops...",
+    loadingExpenses: "Loading expenses...",
+    loadingHarvests: "Loading harvests...",
+    loadingActivities: "Loading activities...",
+    failedToLoad: "Failed to load data",
+    startExpense: "No expenses found. Start by adding your first expense.",
+    startHarvest: "No harvest records found. Start by adding your first harvest record.",
+    startActivity: "No activities found. Start by adding your first activity log.",
+    startCrop: "You haven't added any crops matching this filter.",
+
+    // Categories (Expenses / Activities)
+    catSeeds: "Seeds",
+    catFertilizer: "Fertilizer",
+    catPesticide: "Pesticide",
+    catLabor: "Labor",
+    catTransport: "Transportation",
+    catIrrigation: "Irrigation",
+    catOthers: "Others",
+    actLandPrep: "Land Preparation",
+    actPlanting: "Planting",
+    actWatering: "Watering",
+    actFertilizing: "Fertilizing",
+    actSpraying: "Spraying",
+    actWeeding: "Weeding",
+    actHarvesting: "Harvesting",
+    
+    // Form fields
+    cropNameLabel: "Crop Name",
+    areaUnitLabel: "Area Unit",
+    sqm: "Square Meters",
+    hectare: "Hectare",
+    selectCrop: "Select crop",
+    quantityLabel: "Quantity",
+    unitLabel: "Unit",
+    pricePerUnitLabel: "Price per Unit",
+    estTotalValue: "Estimated Total Value",
+    activityTypeLabel: "Activity Type",
+    editCrop: "Edit Crop",
+    updateCrop: "Update Crop",
+    updating: "Updating...",
+    cropDetails: "Crop Details",
+    actualHarvestDate: "Actual Harvest Date",
+    statusLabel: "Status",
+    deleting: "Deleting...",
+    viewDetails: "View Details",
+    
+    // NPC (Additional UI)
+    assistantTitle: "Smart Assistant",
+    assistantSub: "Advanced AI Farmer Guide",
+    quickActions: "Quick Prompts",
+  },
+  tl: {
+    // Nav & Common
+    langName: "Filipino",
+    dashboard: "Dashboard",
+    crops: "Pananim",
+    profile: "Profile",
+    harvests: "Mga Ani",
+    expenses: "Mga Gastos",
+    activities: "Mga Aktibidad",
+    loading: "Naglo-load...",
+    error: "May naganap na error",
+    seeAll: "Tingnan lahat",
+    
+    // Auth
+    loginTitle: "Maligayang pagbabalik!",
+    loginSubtitle: "Mag-sign in para pamahalaan ang bukid",
+    emailAddr: "Email Address",
+    password: "Password",
+    loginBtn: "Mag-sign In",
+    noAccount: "Wala pang account?",
+    registerHere: "Mag-register rito",
+    registerTitle: "Lumikha ng Account",
+    fullName: "Buong Pangalan",
+    haveAccount: "May account na?",
+    loginHere: "Mag-sign in rito",
+    syncing: "Sini-sync ang datos ng bukid...",
+    dashError: "Nabigong i-load. Tiyaking nakalog-in ka.",
+
+    // Dashboard
+    goodMorning: "Magandang umaga",
+    goodAfternoon: "Magandang hapon",
+    goodEvening: "Magandang gabi",
+    yourFarm: "Buod ng Bukid",
+    growingNicely: "Lumalago ang lahat nang maayos.",
+    activeCrops: "Aktibong Pananim",
+    totalExpenses: "Kabuuang Gastos",
+    harvestValue: "Kita sa Ani",
+    upcomingHarvests: "Malapit nang Anihin",
+    viewAll: "Tingnan lahat",
+    history: "Kasaysayan",
+    noUpcoming: "Walang pananim na malapit anihin.",
+    expected: "Inaasahan",
+    recentActivities: "Kamakailang Aktibidad",
+    noActivities: "Wala pang aktibidad na naitala.",
+    quickCtaLabel: "Magtanim",
+    quickCtaSub: "Bagong pananim",
+
+    // Profile
+    myProfile: "Aking Profile",
+    accountDetails: "Detalye ng Account",
+    nameLabel: "Pangalan",
+    emailLabel: "Email",
+    prefsTitle: "Mga Paborito",
+    langLabel: "Wika (Language)",
+    themeLabel: "Tema",
+    themeLight: "Maliwanag",
+    themeDark: "Madilim",
+    themeSystem: "Sistema",
+    logoutBtn: "Mag-log out",
+
+    // Crops
+    myCrops: "Mga Pananim Ko",
+    addCrop: "Magdagdag",
+    noCrops: "Walang pananim. Magtanim na!",
+    plotName: "Lupa",
+    expectedHarvest: "Inaasahang Ani",
+    plantedDate: "Petsa ng Pagtatanim",
+    variety: "Baryedad",
+    area: "Sukat",
+    statusActive: "Aktibo",
+    statusHarvested: "Inani na",
+
+    // Expenses / Activities / Harvests
+    dateLabel: "Petsa",
+    amountLabel: "Halaga",
+    categoryLabel: "Kategorya",
+    notesLabel: "Tala",
+    addExpense: "Maglagay ng Gastos",
+    myExpenses: "Mga Gastos Ko",
+    addHarvest: "Tala ng Ani",
+    myHarvests: "Mga Ani Ko",
+    noExpenses: "Walang naitalang gastos.",
+    noHarvests: "Walang naitalang ani.",
+    addActivity: "Magdagdag ng Aktibidad",
+    myActivities: "Mga Aktibidad Ko",
+
+    // Filters & Actions
+    filterAllCrops: "Lahat ng Pananim",
+    filterActive: "Kasalukuyang Tumutubo",
+    filterHarvested: "Inani Na",
+    filterFailed: "Nasira / Nawala",
+    filterCategory: "Salain ayon sa kategorya",
+    filterAllActivities: "Lahat ng Aktibidad",
+    filterActivity: "Salain ayon sa aktibidad",
+    filterAllCategories: "Lahat ng Kategorya",
+    delete: "Burahin",
+    confirmDelete: "Sigurado ka bang nais mong burahin ito?",
+    saveCrop: "I-save ang Pananim",
+    saveActivity: "I-save ang Aktibidad",
+    saveHarvest: "I-save ang Ani",
+    saveExpense: "I-save ang Gastos",
+    saving: "Sini-save...",
+    cancel: "Kanselahin",
+
+    // Empty states
+    loadingCrops: "Nilo-load ang mga pananim...",
+    loadingExpenses: "Nilo-load ang mga gastos...",
+    loadingHarvests: "Nilo-load ang talaan ng ani...",
+    loadingActivities: "Nilo-load ang mga aktibidad...",
+    failedToLoad: "Nabigong i-load ang datos",
+    startExpense: "Walang nakitang gastos. Simulan sa pagdagdag ng gastos.",
+    startHarvest: "Walang talaan ng ani. Magdagdag ng iyong unang ani.",
+    startActivity: "Walang aktibidad. Simulan sa pagtala ng unang aktibidad.",
+    startCrop: "Wala kang pananim na pumapasa sa filter na ito.",
+
+    // Categories (Expenses / Activities)
+    catSeeds: "Binhi",
+    catFertilizer: "Pataba",
+    catPesticide: "Pestisidyo",
+    catLabor: "Manggagawa",
+    catTransport: "Transportasyon",
+    catIrrigation: "Irigasyon",
+    catOthers: "Iba Pa",
+    actLandPrep: "Paghahanda ng Lupa",
+    actPlanting: "Pagtatanim",
+    actWatering: "Pagdidilig",
+    actFertilizing: "Pagpapataba",
+    actSpraying: "Pag-spray",
+    actWeeding: "Pag-aalis ng Damo",
+    actHarvesting: "Pag-aani",
+
+    // Form fields
+    cropNameLabel: "Pangalan ng Pananim",
+    areaUnitLabel: "Yunit ng Sukat",
+    sqm: "Metro Kwadrado",
+    hectare: "Ektarya",
+    selectCrop: "Pumili ng pananim",
+    quantityLabel: "Dami",
+    unitLabel: "Yunit",
+    pricePerUnitLabel: "Presyo bawat Yunit",
+    estTotalValue: "Tinantyang Kabuuang Halaga",
+    activityTypeLabel: "Uri ng Aktibidad",
+    editCrop: "I-edit ang Pananim",
+    updateCrop: "I-update ang Pananim",
+    updating: "Ini-update...",
+    cropDetails: "Mga Detalye ng Pananim",
+    actualHarvestDate: "Tunay na Petsa ng Ani",
+    statusLabel: "Katayuan",
+    deleting: "Binubura...",
+    viewDetails: "Tingnan ang Detalye",
+
+    // NPC
+    assistantTitle: "Smart Assistant",
+    assistantSub: "Modernong AI Gabay",
+    quickActions: "Mabilisang Tanong",
+  }
+};
+
+const TranslationContext = createContext();
+
+export const TranslationProvider = ({ children }) => {
+  const { user } = useAuth();
+  const currentLang = user?.languagePreference === "tl" ? "tl" : "en";
+
+  const t = useCallback(
+    (key) => {
+      // Fallback to English if key is completely missing in Tagalog (shouldn't happen here, but safe practice)
+      return translations[currentLang]?.[key] || translations["en"]?.[key] || key;
+    },
+    [currentLang]
+  );
+
+  return (
+    <TranslationContext.Provider value={{ t, lang: currentLang }}>
+      {children}
+    </TranslationContext.Provider>
+  );
+};
+
+export const useTranslation = () => useContext(TranslationContext);

@@ -50,6 +50,22 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("user");
   };
 
+  const updatePreferences = async (prefs) => {
+    try {
+      const { data } = await API.put("/auth/preferences", prefs);
+      // The backend response doesn't include the token, so we merge it from the current session
+      const updatedUser = { ...data, token: user?.token };
+      setUser(updatedUser);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to update preferences",
+      };
+    }
+  };
+
   useEffect(() => {
     if (user?.token) {
       API.defaults.headers.common["Authorization"] = `Bearer ${user.token}`;
@@ -59,7 +75,7 @@ export const AuthProvider = ({ children }) => {
   }, [user]);
 
   return (
-    <AuthContext.Provider value={{ user, loading, register, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, register, login, logout, updatePreferences }}>
       {children}
     </AuthContext.Provider>
   );

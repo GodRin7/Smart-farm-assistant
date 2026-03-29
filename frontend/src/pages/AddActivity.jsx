@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import MobileLayout from "../components/MobileLayout";
 import { getCrops } from "../api/cropApi";
 import { createActivity } from "../api/activityApi";
+import { useTranslation } from "../context/TranslationContext";
 
 function AddActivity() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [crops, setCrops] = useState([]);
   const [formData, setFormData] = useState({
@@ -25,7 +27,7 @@ function AddActivity() {
         const data = await getCrops("active");
         setCrops(data);
       } catch (error) {
-        setError("Failed to load crops");
+        setError(t("failedToLoad"));
       } finally {
         setLoadingCrops(false);
       }
@@ -50,29 +52,31 @@ function AddActivity() {
       await createActivity(formData);
       navigate("/activities");
     } catch (error) {
-      setError(error.response?.data?.message || "Failed to create activity");
+      setError(error.response?.data?.message || t("error"));
     } finally {
       setSaving(false);
     }
   };
 
   return (
-    <MobileLayout title="Add Activity">
+    <MobileLayout title={t("addActivity")}>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="rounded-3xl bg-white p-4 shadow-sm dark:bg-slate-900">
-          <div className="space-y-4">
+        <div className="overflow-hidden rounded-[2rem] border border-white/40 bg-white/70 p-6 shadow-sm backdrop-blur-xl dark:border-slate-800/50 dark:bg-slate-900/50">
+          <div className="space-y-5">
             <div>
-              <label className="mb-2 block text-sm font-medium">Crop</label>
+              <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                {t("cropNameLabel")}
+              </label>
               <select
                 name="crop"
                 value={formData.crop}
                 onChange={handleChange}
-                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                className="w-full rounded-2xl border border-white/60 bg-white/50 px-4 py-3 text-base text-slate-900 shadow-sm outline-none backdrop-blur-sm transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700/60 dark:bg-slate-800/50 dark:text-slate-100 dark:focus:border-emerald-500 dark:focus:bg-slate-800"
                 required
                 disabled={loadingCrops}
               >
                 <option value="">
-                  {loadingCrops ? "Loading crops..." : "Select crop"}
+                  {loadingCrops ? t("loadingCrops") : t("selectCrop")}
                 </option>
                 {crops.map((crop) => (
                   <option key={crop._id} value={crop._id}>
@@ -83,52 +87,58 @@ function AddActivity() {
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">Activity Type</label>
+              <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                {t("activityTypeLabel")}
+              </label>
               <select
                 name="activityType"
                 value={formData.activityType}
                 onChange={handleChange}
-                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                className="w-full rounded-2xl border border-white/60 bg-white/50 px-4 py-3 text-base text-slate-900 shadow-sm outline-none backdrop-blur-sm transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700/60 dark:bg-slate-800/50 dark:text-slate-100 dark:focus:border-emerald-500 dark:focus:bg-slate-800"
               >
-                <option value="land_preparation">Land Preparation</option>
-                <option value="planting">Planting</option>
-                <option value="watering">Watering</option>
-                <option value="fertilizing">Fertilizing</option>
-                <option value="spraying">Spraying</option>
-                <option value="weeding">Weeding</option>
-                <option value="harvesting">Harvesting</option>
-                <option value="others">Others</option>
+                <option value="land_preparation">{t("actLandPrep")}</option>
+                <option value="planting">{t("actPlanting")}</option>
+                <option value="watering">{t("actWatering")}</option>
+                <option value="fertilizing">{t("actFertilizing")}</option>
+                <option value="spraying">{t("actSpraying")}</option>
+                <option value="weeding">{t("actWeeding")}</option>
+                <option value="harvesting">{t("actHarvesting")}</option>
+                <option value="others">{t("catOthers")}</option>
               </select>
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">Date</label>
+              <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                {t("dateLabel")}
+              </label>
               <input
                 type="date"
                 name="date"
                 value={formData.date}
                 onChange={handleChange}
-                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                className="w-full rounded-2xl border border-white/60 bg-white/50 px-4 py-3 text-base text-slate-900 shadow-sm outline-none backdrop-blur-sm transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700/60 dark:bg-slate-800/50 dark:text-slate-100 dark:focus:border-emerald-500 dark:focus:bg-slate-800"
                 required
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">Notes</label>
+              <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                {t("notesLabel")}
+              </label>
               <textarea
                 name="notes"
                 value={formData.notes}
                 onChange={handleChange}
                 rows="4"
-                placeholder="Optional notes"
-                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                placeholder="..."
+                className="w-full rounded-2xl border border-white/60 bg-white/50 px-4 py-3 text-base text-slate-900 shadow-sm outline-none backdrop-blur-sm transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700/60 dark:bg-slate-800/50 dark:text-slate-100 dark:focus:border-emerald-500 dark:focus:bg-slate-800"
               />
             </div>
           </div>
         </div>
 
         {error && (
-          <div className="rounded-2xl bg-red-100 px-4 py-3 text-sm text-red-700 dark:bg-red-900/30 dark:text-red-300">
+          <div className="rounded-[2rem] border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700 shadow-sm dark:border-red-900/30 dark:bg-red-900/20 dark:text-red-300">
             {error}
           </div>
         )}
@@ -136,9 +146,9 @@ function AddActivity() {
         <button
           type="submit"
           disabled={saving}
-          className="w-full rounded-2xl bg-green-600 px-4 py-3 text-base font-semibold text-white"
+          className="w-full rounded-[2rem] bg-emerald-600 px-4 py-4 text-base font-bold tracking-wide text-white shadow-md shadow-emerald-600/20 transition-all hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-600/30 active:scale-[0.98]"
         >
-          {saving ? "Saving..." : "Save Activity"}
+          {saving ? t("saving") : t("saveActivity")}
         </button>
       </form>
     </MobileLayout>

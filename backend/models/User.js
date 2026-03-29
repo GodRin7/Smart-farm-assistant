@@ -23,6 +23,11 @@ const userSchema = new mongoose.Schema(
       enum: ["light", "dark", "system"],
       default: "system",
     },
+    languagePreference: {
+      type: String,
+      enum: ["en", "tl"],
+      default: "en",
+    },
   },
   {
     timestamps: true,

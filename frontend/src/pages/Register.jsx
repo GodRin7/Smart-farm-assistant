@@ -2,11 +2,13 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
+import { useTranslation } from "../context/TranslationContext";
 
 function Register() {
   const navigate = useNavigate();
   const { register, loading } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { t } = useTranslation();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -51,7 +53,7 @@ function Register() {
       <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <div className="mb-6 flex items-start justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold">Create account</h1>
+            <h1 className="text-2xl font-bold">{t("registerTitle")}</h1>
             <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
               Start managing your farm records.
             </p>
@@ -61,19 +63,19 @@ function Register() {
             onClick={toggleTheme}
             className="rounded-xl border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 dark:border-slate-700 dark:text-slate-200"
           >
-            {theme === "light" ? "Dark" : "Light"}
+            {theme === "light" ? t("themeDark") : t("themeLight")}
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-              Full Name
+              {t("fullName")}
             </label>
             <input
               type="text"
               name="name"
-              placeholder="Enter your full name"
+              placeholder={t("fullName")}
               value={formData.name}
               onChange={handleChange}
               className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 placeholder:text-slate-500 outline-none focus:border-green-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-400"
@@ -82,12 +84,12 @@ function Register() {
 
           <div>
             <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-              Email
+              {t("emailAddr")}
             </label>
             <input
               type="email"
               name="email"
-              placeholder="Enter your email"
+              placeholder={t("emailAddr")}
               value={formData.email}
               onChange={handleChange}
               className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 placeholder:text-slate-500 outline-none focus:border-green-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-400"
@@ -96,12 +98,12 @@ function Register() {
 
           <div>
             <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-              Password
+              {t("password")}
             </label>
             <input
               type="password"
               name="password"
-              placeholder="Enter your password"
+              placeholder={t("password")}
               value={formData.password}
               onChange={handleChange}
               className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 placeholder:text-slate-500 outline-none focus:border-green-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-400"
@@ -133,14 +135,14 @@ function Register() {
             disabled={loading}
             className="w-full rounded-2xl bg-green-600 px-4 py-3 text-base font-semibold text-white transition hover:bg-green-700 disabled:opacity-70"
           >
-            {loading ? "Creating account..." : "Register"}
+            {loading ? t("loading") : t("registerHere")}
           </button>
         </form>
 
         <p className="mt-4 text-sm text-slate-600 dark:text-slate-400">
-          Already have an account?{" "}
+          {t("haveAccount")}{" "}
           <Link to="/login" className="font-medium text-green-600 dark:text-green-400">
-            Login
+            {t("loginHere")}
           </Link>
         </p>
       </div>
