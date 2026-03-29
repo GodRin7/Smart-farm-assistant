@@ -220,12 +220,12 @@ function FarmerAssistant() {
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
+        className="fixed inset-0 z-[90] bg-black/40 backdrop-blur-sm"
         onClick={() => setIsOpen(false)}
       />
 
       {/* ─── NPC Dialog Panel ─── */}
-      <div className="fixed inset-x-0 bottom-0 z-50 flex max-h-[88vh] flex-col overflow-hidden rounded-t-[2rem] bg-[#fffcf5] shadow-2xl dark:bg-[#0f0e0a] sm:inset-auto sm:bottom-24 sm:right-4 sm:h-[680px] sm:w-[400px] sm:rounded-[2rem]">
+      <div className="fixed inset-x-0 bottom-0 z-[100] flex h-[85dvh] flex-col overflow-hidden rounded-t-[2rem] bg-[#fffcf5] shadow-2xl dark:bg-[#0f0e0a] sm:inset-auto sm:bottom-24 sm:right-4 sm:h-auto sm:max-h-[680px] sm:w-[400px] sm:rounded-[2rem]">
 
         {/* ── Header: farmer portrait strip ── */}
         <div className="relative flex-shrink-0 bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-200 px-5 py-4 shadow-sm dark:from-amber-700 dark:via-amber-800 dark:to-amber-900 z-10">
