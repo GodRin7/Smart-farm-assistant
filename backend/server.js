@@ -8,22 +8,12 @@ connectDB();
 
 const app = express();
 
-// Allow both Vite dev ports and production Vercel frontend
-const allowedOrigins = [
-  "http://localhost:5173", 
-  "http://localhost:5174",
-  process.env.FRONTEND_URL
-].filter(Boolean); // Remove undefined/null strings locally
-
+// Allow cross-origin requests flexibly
 app.use(
   cors({
     origin: function (origin, callback) {
-      // allow requests with no origin (like mobile apps or curl requests)
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
+      // Reflects the requested origin to allow credentials
+      callback(null, true);
     },
     credentials: true,
   })
