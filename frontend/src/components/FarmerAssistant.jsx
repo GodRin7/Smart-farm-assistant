@@ -120,10 +120,26 @@ function FarmerAssistant() {
   const [inputText, setInputText] = useState("");
   const messagesEndRef = useRef(null);
 
+  const [viewportHeight, setViewportHeight] = useState("100dvh");
+
   const scrollToBottom = () =>
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
 
-  useEffect(() => { scrollToBottom(); }, [messages, loading]);
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, loading]);
+
+  // Fix for Messenger/Android Webview keyboard overlays
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.visualViewport) return;
+    const updateHeight = () => {
+      setViewportHeight(`${window.visualViewport.height}px`);
+      setTimeout(scrollToBottom, 100);
+    };
+    window.visualViewport.addEventListener("resize", updateHeight);
+    updateHeight();
+    return () => window.visualViewport.removeEventListener("resize", updateHeight);
+  }, []);
 
   useEffect(() => {
     if (isOpen && messages.length === 0) fetchGreeting();
@@ -217,16 +233,19 @@ function FarmerAssistant() {
   }
 
   return (
-    <div className="fixed inset-0 z-[100] overflow-y-auto overflow-x-hidden">
+    <div 
+      className="fixed inset-x-0 top-0 z-[100] overflow-y-auto overflow-x-hidden bg-black/40 backdrop-blur-sm transition-all duration-200"
+      style={{ height: viewportHeight }}
+    >
       <div className="flex min-h-full flex-col justify-end sm:items-end sm:p-6">
-        {/* Backdrop */}
+        {/* Backdrop click layer */}
         <div
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm"
+          className="absolute inset-0"
           onClick={() => setIsOpen(false)}
         />
 
         {/* ─── NPC Dialog Panel ─── */}
-        <div className="relative z-10 flex h-[85dvh] w-full flex-col overflow-hidden rounded-t-[2rem] bg-[#fffcf5] shadow-2xl dark:bg-[#0f0e0a] sm:mb-16 sm:h-auto sm:max-h-[680px] sm:w-[400px] sm:rounded-[2rem]">
+        <div className="relative z-10 flex h-[85vh] w-full flex-col overflow-hidden rounded-t-[2rem] bg-[#fffcf5] shadow-2xl dark:bg-[#0f0e0a] sm:mb-16 sm:h-auto sm:max-h-[680px] sm:w-[400px] sm:rounded-[2rem]">
 
         {/* ── Header: farmer portrait strip ── */}
         <div className="relative flex-shrink-0 bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-200 px-5 py-4 shadow-sm dark:from-amber-700 dark:via-amber-800 dark:to-amber-900 z-10">
