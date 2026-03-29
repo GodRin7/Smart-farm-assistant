@@ -7,6 +7,8 @@ import { useTranslation } from "../context/TranslationContext";
 
 function Harvests() {
   const [harvests, setHarvests] = useState([]);
+  const [cropFilter, setCropFilter] = useState("");
+  const [dateFilter, setDateFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const { t, lang } = useTranslation();
@@ -41,6 +43,22 @@ function Harvests() {
     }
   };
 
+  const uniqueCrops = Array.from(new Set(harvests.map(h => h.crop?._id).filter(Boolean)))
+    .map(id => harvests.find(h => h.crop?._id === id).crop);
+
+  const filteredHarvests = harvests.filter(harv => {
+    if (cropFilter && harv.crop?._id !== cropFilter) return false;
+    if (dateFilter) {
+      try {
+        const hDate = new Date(harv.harvestDate).toISOString().split('T')[0];
+        if (hDate !== dateFilter) return false;
+      } catch (e) {
+        return false;
+      }
+    }
+    return true;
+  });
+
   return (
     <MobileLayout
       title={t("myHarvests")}
@@ -54,6 +72,37 @@ function Harvests() {
       }
     >
       <div className="space-y-4">
+        {/* Advanced Filter UI */}
+        <div className="grid grid-cols-2 gap-3 pb-2">
+          {/* Crop Select */}
+          <div className="relative overflow-hidden rounded-[1.5rem] border border-slate-200/60 bg-white/70 shadow-sm backdrop-blur-xl dark:border-slate-800/50 dark:bg-slate-900/50">
+            <div className="flex items-center px-4 py-3 h-full">
+              <select
+                value={cropFilter}
+                onChange={(e) => setCropFilter(e.target.value)}
+                className="w-full bg-transparent text-sm font-medium text-slate-700 outline-none dark:text-slate-200"
+              >
+                <option value="">All Crops</option>
+                {uniqueCrops.map(c => (
+                  <option key={c._id} value={c._id}>{c.cropName} {c.plotName ? `(${c.plotName})` : ''}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Date Input */}
+          <div className="relative overflow-hidden rounded-[1.5rem] border border-slate-200/60 bg-white/70 shadow-sm backdrop-blur-xl dark:border-slate-800/50 dark:bg-slate-900/50">
+            <div className="flex items-center px-4 py-3 h-full">
+              <input
+                type="date"
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+                className="w-full bg-transparent text-sm font-medium text-slate-700 outline-none dark:text-slate-200"
+              />
+            </div>
+          </div>
+        </div>
+
         {loading && (
           <div className="flex h-40 flex-col items-center justify-center space-y-4 rounded-[2rem] bg-white/50 backdrop-blur-xl shadow-sm dark:bg-[#0f172a]/50 border border-white/20 dark:border-slate-800/50">
             <RefreshCw className="h-8 w-8 animate-spin text-emerald-500" />
@@ -81,7 +130,7 @@ function Harvests() {
 
         {!loading && !error && (
           <div className="grid gap-4">
-            {harvests.map((harvest) => (
+            {filteredHarvests.map((harvest) => (
               <div
                 key={harvest._id}
                 className="group relative overflow-hidden rounded-[2rem] border border-white/40 bg-white/70 p-5 shadow-sm backdrop-blur-xl transition-all hover:border-emerald-200 hover:shadow-md dark:border-slate-800/50 dark:bg-slate-900/50 dark:hover:border-emerald-800/50"
@@ -144,6 +193,10 @@ function Harvests() {
                 </div>
               </div>
             ))}
+            
+            {filteredHarvests.length === 0 && harvests.length > 0 && (
+              <p className="text-center text-sm font-medium text-slate-500 py-8">No matching harvests found.</p>
+            )}
           </div>
         )}
       </div>

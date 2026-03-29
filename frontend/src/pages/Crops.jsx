@@ -3,12 +3,13 @@ import { Link } from "react-router-dom";
 import MobileLayout from "../components/MobileLayout";
 import CropCard from "../components/CropCard";
 import { getCrops } from "../api/cropApi";
-import { Plus, Filter, Sprout, RefreshCw } from "lucide-react";
+import { Plus, Filter, Sprout, RefreshCw, Search } from "lucide-react";
 import { useTranslation } from "../context/TranslationContext";
 
 function Crops() {
   const [crops, setCrops] = useState([]);
   const [statusFilter, setStatusFilter] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const { t } = useTranslation();
@@ -30,6 +31,12 @@ function Crops() {
     fetchCrops();
   }, [statusFilter]);
 
+  const filteredCrops = crops.filter(crop => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return crop.cropName?.toLowerCase().includes(q) || crop.plotName?.toLowerCase().includes(q);
+  });
+
   return (
     <MobileLayout
       title={t("myCrops")}
@@ -43,20 +50,35 @@ function Crops() {
       }
     >
       <div className="space-y-6">
-        {/* Filter Bar */}
-        <div className="relative overflow-hidden rounded-[2rem] border border-white/40 bg-white/70 p-2 shadow-sm backdrop-blur-xl dark:border-slate-800/50 dark:bg-slate-900/50">
-          <div className="flex items-center rounded-[1.5rem] bg-slate-50/80 px-4 py-1 dark:bg-[#0f172a]/80">
-            <Filter size={18} className="text-slate-400" />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full bg-transparent px-3 py-3 text-sm font-medium text-slate-700 outline-none dark:text-slate-200"
-            >
-              <option value="">{t("filterAllCrops")}</option>
-              <option value="active">{t("filterActive")}</option>
-              <option value="harvested">{t("filterHarvested")}</option>
-              <option value="failed">{t("filterFailed")}</option>
-            </select>
+        {/* Search & Filter Bar */}
+        <div className="grid grid-cols-1 gap-3">
+          <div className="relative overflow-hidden rounded-[1.5rem] border border-slate-200/60 bg-white/70 shadow-sm backdrop-blur-xl dark:border-slate-800/50 dark:bg-slate-900/50">
+            <div className="flex items-center px-4 py-3">
+              <Search size={18} className="text-slate-400 shrink-0" />
+              <input
+                type="text"
+                placeholder={t("searchCrops") || "Search crops or plots..."}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-transparent px-3 text-sm font-medium text-slate-800 outline-none placeholder:text-slate-400 dark:text-slate-100"
+              />
+            </div>
+          </div>
+
+          <div className="relative overflow-hidden rounded-[1.5rem] border border-slate-200/60 bg-white/70 shadow-sm backdrop-blur-xl dark:border-slate-800/50 dark:bg-slate-900/50">
+            <div className="flex items-center px-4 py-3">
+              <Filter size={18} className="text-slate-400 shrink-0" />
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="w-full bg-transparent px-3 text-sm font-medium text-slate-700 outline-none dark:text-slate-200"
+              >
+                <option value="">{t("filterAllCrops")}</option>
+                <option value="active">{t("filterActive")}</option>
+                <option value="harvested">{t("filterHarvested")}</option>
+                <option value="failed">{t("filterFailed")}</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -87,7 +109,10 @@ function Crops() {
 
         {!loading && !error && (
           <div className="grid gap-4">
-            {crops.map((crop) => <CropCard key={crop._id} crop={crop} />)}
+            {filteredCrops.map((crop) => <CropCard key={crop._id} crop={crop} />)}
+            {filteredCrops.length === 0 && crops.length > 0 && (
+              <p className="text-center text-sm font-medium text-slate-500 py-8">No matching crops found.</p>
+            )}
           </div>
         )}
       </div>

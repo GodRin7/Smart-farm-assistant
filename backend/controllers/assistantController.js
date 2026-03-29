@@ -5,17 +5,55 @@ const Activity = require("../models/Activity");
 const Expense = require("../models/Expense");
 const Harvest = require("../models/Harvest");
 
+let aiClient = null;
+
+const callGeminiAPI = async (userMsg, userId) => {
+  if (!aiClient) {
+    if (!process.env.GEMINI_API_KEY) return null;
+    aiClient = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  }
+
+  // Gather farm context
+  try {
+    const [activeCrops, expAgg, harvAgg] = await Promise.all([
+      Crop.countDocuments({ user: userId, status: "active" }),
+      Expense.aggregate([{ $match: { user: userId } }, { $group: { _id: null, total: { $sum: "$amount" } } }]),
+      Harvest.aggregate([{ $match: { user: userId } }, { $group: { _id: null, total: { $sum: "$totalValue" } } }])
+    ]);
+    const expenses = expAgg[0]?.total || 0;
+    const harvests = harvAgg[0]?.total || 0;
+
+    const systemInstruction = `You are Mang Mando, a wise, deeply experienced Filipino farmer serving as an RPG assistant.
+- You must reply cheerfully in authentic conversational Taglish (Tagalog mixed with farming English terms) natively.
+- Address the user warmly as "kaibigan" or "partner".
+- Provide extremely brief, highly concise answers (1 to 2 short sentences ONLY) as you are speaking in a small game dialogue box.
+- Never use markdown styling like asterisks or bolding. Use plain text.
+- Here is the user's current farm context: They have ${activeCrops} active crops, ₱${expenses} total expenses, and ₱${harvests} crop harvest value.
+- Answer their direct question based on real-world farming knowledge or their farm context.`;
+
+    const response = await aiClient.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: `${systemInstruction}\n\nUser Question: ${userMsg}`,
+    });
+    return response.text;
+  } catch (err) {
+    console.error("Gemini API Error:", err);
+    return null;
+  }
+};
+
+
 // ─── Bilingual string library ───────────────────────────────────────────────
 const t = {
   en: {
     greeting: (name) =>
-      `Hello${name ? ", " + name : ""}! I'm your Farmer Guide. How can I help you today?`,
+      `Kumusta${name ? " " + name : ""}! Ako si Mang Mando. Magandang araw para sa bukid! What can I help you check on today?`,
 
     // Crops
     cropsIntro: (count) =>
       count === 0
-        ? "You don't have any active crops right now."
-        : `You have ${count} active crop${count !== 1 ? "s" : ""} growing right now.`,
+        ? "Aba, looks like the soil is resting. Wala tayong active crops sproutin' right now."
+        : `Aba'y tignan mo nga naman! We've got ${count} active crop field${count !== 1 ? "s" : ""} growing strong out there.`,
     cropItem: (crop) => {
       const date = crop.expectedHarvestDate
         ? new Date(crop.expectedHarvestDate).toLocaleDateString("en-US", {
@@ -34,8 +72,8 @@ const t = {
     // Activities
     activitiesIntro: (count) =>
       count === 0
-        ? "No recent farm activities recorded yet."
-        : `Here are your ${count} most recent farm activit${count !== 1 ? "ies" : "y"}.`,
+        ? "Wala pa tayong bagong activities lately. No recent farm chores recorded yet."
+        : `Sure thing, kaibigan! Heto ang ${count} most recent chores we've been busy with on the farm.`,
     activityItem: (act) => ({
       label: act.activityType.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase()),
       detail: `${act.crop?.cropName || "Unknown crop"} · ${new Date(act.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`,
@@ -44,8 +82,8 @@ const t = {
     // Expenses
     expensesIntro: (total) =>
       total === 0
-        ? "No expenses recorded yet. Keep track of your costs here."
-        : `Your recent farm expenses total ₱${Number(total).toLocaleString()}.`,
+        ? "Nakakaluwag-luwag tayo! No expenses recorded yet. Just make sure to log 'em when you buy supplies."
+        : `Ayon sa ating listahan, our recent farm expenses total to exactly ₱${Number(total).toLocaleString()}.`,
     expenseItem: (exp) => ({
       label: `${exp.category.replace(/\b\w/g, (c) => c.toUpperCase())} — ₱${Number(exp.amount).toLocaleString()}`,
       detail: `${exp.crop?.cropName || "Unknown crop"} · ${new Date(exp.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`,
@@ -54,8 +92,8 @@ const t = {
     // Harvests
     harvestsIntro: (count, total) =>
       count === 0
-        ? "No harvest records found yet. Add your first harvest!"
-        : `You have ${count} harvest record${count !== 1 ? "s" : ""} with a total value of ₱${Number(total).toLocaleString()}.`,
+        ? "Wala pa tayong harvests yet. But don't you worry, konting tiyaga pa!"
+        : `Biyaya! We have ${count} harvest record${count !== 1 ? "s" : ""} brought in, giving us a total value of ₱${Number(total).toLocaleString()}.`,
     harvestItem: (h) => ({
       label: `${h.crop?.cropName || "Unknown"} — ₱${Number(h.totalValue).toLocaleString()}`,
       detail: `${h.quantity} ${h.unit} · ${new Date(h.harvestDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`,
@@ -63,30 +101,51 @@ const t = {
 
     // Summary
     summaryIntro: (s) =>
-      `You have ${s.activeCrops} active crop${s.activeCrops !== 1 ? "s" : ""}, ` +
-      `₱${Number(s.totalExpenses).toLocaleString()} in expenses, ` +
-      `and ₱${Number(s.totalHarvestValue).toLocaleString()} in harvest value.`,
+      `Tingnan natin! We've got ${s.activeCrops} active crop${s.activeCrops !== 1 ? "s" : ""} growing. ` +
+      `Gumastos tayo ng mga ₱${Number(s.totalExpenses).toLocaleString()} so far, ` +
+      `and our harvests have brought in a fine ₱${Number(s.totalHarvestValue).toLocaleString()}!`,
+
+    // Upcoming Harvests
+    upcomingHarvestsIntro: (count) =>
+      count === 0
+        ? "Chineck ko sa kalendaryo. Wala tayong aanihin in the next two weeks. Keep watering!"
+        : `Ihanda na ang mga kaing! We have ${count} crop${count !== 1 ? "s" : ""} approaching harvest time very soon!`,
+    upcomingHarvestItem: (crop) => ({
+      label: `${crop.cropName}${crop.plotName ? " — " + crop.plotName : ""}`,
+      detail: `Expected: ${new Date(crop.expectedHarvestDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`,
+      badge: "soon",
+    }),
+
+    // Highest Expenses
+    highestExpenseIntro: (count) =>
+       count === 0 ? "Kulang pa ang records natin to do the math yet." : "Naku po, here are the crops that are eating up the biggest chunk of our budget:",
+    highestExpenseItem: (crop) => ({
+      label: `${crop.cropName || "Unknown"} — ₱${Number(crop.totalExpenses).toLocaleString()}`,
+      detail: `${crop.expenseCount} expense records total`,
+    }),
+
+    fallbackMessage: "Pasensya na kaibigan, medyo mahina na ang pandinig ko! Could you try asking me about your 'crops', 'expenses', 'highest expenses', 'upcoming harvests', or 'activities'?",
 
     // Quick replies
-    quickReplies: ["crops", "activities", "expenses", "harvests", "summary"],
+    quickReplies: ["crops", "activities", "expenses", "upcoming_harvests", "highest_expenses"],
     quickReplyLabels: {
       crops: "🌱 Active Crops",
       activities: "🗓 Recent Activities",
       expenses: "💸 Recent Expenses",
-      harvests: "🌾 Harvest Records",
-      summary: "📊 My Farm Summary",
+      upcoming_harvests: "🌾 Upcoming Harvests",
+      highest_expenses: "🔥 Highest Expenses",
     },
   },
 
   tl: {
     greeting: (name) =>
-      `Kamusta${name ? ", " + name : ""}! Ako ang iyong Gabay sa Bukid. Paano kita matutulungan ngayon?`,
+      `Kumusta, kaibigan${name ? " " + name : ""}! Ako si Mang Mando, ang iyong gabay. Magandang araw para pumunta sa bukid! Ano ang matutulong ko sa'yo ngayon?`,
 
     // Crops
     cropsIntro: (count) =>
       count === 0
-        ? "Wala kang aktibong pananim sa ngayon."
-        : `Mayroon kang ${count} aktibong pananim ngayon.`,
+        ? "Aba, mukhang nagpapahinga pa ang ating lupa. Wala tayong aktibong pananim sa ngayon."
+        : `Magandang balita! Mayroon tayong ${count} aktibong pananim na masigabong tumutubo sa bukid ngayon.`,
     cropItem: (crop) => {
       const date = crop.expectedHarvestDate
         ? new Date(crop.expectedHarvestDate).toLocaleDateString("fil-PH", {
@@ -105,8 +164,8 @@ const t = {
     // Activities
     activitiesIntro: (count) =>
       count === 0
-        ? "Wala pang naitala na aktibidad sa bukid."
-        : `Narito ang iyong ${count} pinakabagong aktibidad sa bukid.`,
+        ? "Wala pa tayong naitalang bagong pinagkaabalahan sa bukid kailan lang."
+        : `Narito ang ${count} sa mga pinakahuling gawain na pinagpawisan natin sa bukid!`,
     activityItem: (act) => {
       const typeMap = {
         land_preparation: "Paghahanda ng Lupa",
@@ -127,8 +186,8 @@ const t = {
     // Expenses
     expensesIntro: (total) =>
       total === 0
-        ? "Wala pang gastos na naitala. Itala ang iyong mga gastos dito."
-        : `Ang iyong mga kamakailang gastos sa bukid ay ₱${Number(total).toLocaleString()} ang kabuuan.`,
+        ? "Nakakaluwag-luwag tayo! Wala pa tayong naitalang gastos. Mag-ingat sa pagbili ng supplies, ah!"
+        : `Ayon sa ating listahan, ang mga kamakailang gastos natin sa bukid ay pumalo sa ₱${Number(total).toLocaleString()}.`,
     expenseItem: (exp) => {
       const catMap = {
         seeds: "Binhi",
@@ -148,8 +207,8 @@ const t = {
     // Harvests
     harvestsIntro: (count, total) =>
       count === 0
-        ? "Wala pang talaan ng ani. Idagdag ang iyong unang ani!"
-        : `May ${count} talaan ng ani ka na may kabuuang halagang ₱${Number(total).toLocaleString()}.`,
+        ? "Wala pa tayong naaaning pananim. Konting tiyaga pa, kaibigan!"
+        : `Napakagandang balita! May ${count} talaan tayo ng ani na may kabuuang halagang ₱${Number(total).toLocaleString()}. Biyaya!`,
     harvestItem: (h) => ({
       label: `${h.crop?.cropName || "Hindi kilala"} — ₱${Number(h.totalValue).toLocaleString()}`,
       detail: `${h.quantity} ${h.unit} · ${new Date(h.harvestDate).toLocaleDateString("fil-PH", { month: "short", day: "numeric", year: "numeric" })}`,
@@ -157,18 +216,39 @@ const t = {
 
     // Summary
     summaryIntro: (s) =>
-      `Mayroon kang ${s.activeCrops} aktibong pananim, ` +
-      `₱${Number(s.totalExpenses).toLocaleString()} na gastos, ` +
-      `at ₱${Number(s.totalHarvestValue).toLocaleString()} na kita sa ani.`,
+      `Tingnan natin! Mayroon tayong ${s.activeCrops} aktibong pananim sa kasalukuyan. ` +
+      `Naglabas tayo ng ₱${Number(s.totalExpenses).toLocaleString()} na puhunan, ` +
+      `ngunit kumita naman tayo ng ₱${Number(s.totalHarvestValue).toLocaleString()} mula sa ating mga ani!`,
+
+    // Upcoming Harvests
+    upcomingHarvestsIntro: (count) =>
+      count === 0
+        ? "Chineck ko ang kalendaryo natin, mukhang wala tayong aanihin sa susunod na dalawang linggo. Patuloy lang sa pagdidilig!"
+        : `Ihanda na ang mga kaing! Mayroon tayong ${count} pananim na napakalapit nang anihin!`,
+    upcomingHarvestItem: (crop) => ({
+      label: `${crop.cropName}${crop.plotName ? " — " + crop.plotName : ""}`,
+      detail: `Inaasahan: ${new Date(crop.expectedHarvestDate).toLocaleDateString("fil-PH", { month: "short", day: "numeric" })}`,
+      badge: "lapit na",
+    }),
+
+    // Highest Expenses
+    highestExpenseIntro: (count) =>
+       count === 0 ? "Kulang pa ang ating listahan para malaman ko kung aling tanim ang pinakamagastos." : "Naku po, narito ang mga pananim na pinakamalaki ang kinain sa budget natin:",
+    highestExpenseItem: (crop) => ({
+      label: `${crop.cropName || "Hindi kilala"} — ₱${Number(crop.totalExpenses).toLocaleString()}`,
+      detail: `May ${crop.expenseCount} na tala ng gastos`,
+    }),
+
+    fallbackMessage: "Medyo mahina na ang pandinig ko, kaibigan! Subukan mo kayang itanong ang tungkol sa iyong 'pananim', 'gastos', 'malaking gastos', 'parating na ani', o mga 'aktibidad'?",
 
     // Quick replies
-    quickReplies: ["crops", "activities", "expenses", "harvests", "summary"],
+    quickReplies: ["crops", "activities", "expenses", "upcoming_harvests", "highest_expenses"],
     quickReplyLabels: {
       crops: "🌱 Mga Aktibong Pananim",
       activities: "🗓 Kamakailang Aktibidad",
       expenses: "💸 Kamakailang Gastos",
-      harvests: "🌾 Mga Talaan ng Ani",
-      summary: "📊 Buod ng Aking Bukid",
+      upcoming_harvests: "🌾 Parating na Ani",
+      highest_expenses: "🔥 Pinakamalaking Gastos",
     },
   },
 };
@@ -344,84 +424,161 @@ const getSummaryAssistant = async (req, res) => {
   }
 };
 
+// @route   GET /api/assistant/upcoming-harvests
+const getUpcomingHarvestsAssistant = async (req, res) => {
+  try {
+    const lang = getLang(req);
+    const strings = t[lang];
+    const today = new Date();
+    const next14Days = new Date();
+    next14Days.setDate(today.getDate() + 14);
+
+    const crops = await Crop.find({
+      user: req.user._id,
+      status: "active",
+      expectedHarvestDate: { $gte: today, $lte: next14Days },
+    })
+      .sort({ expectedHarvestDate: 1 })
+      .limit(5);
+
+    res.json({
+      topic: "upcoming_harvests",
+      message: strings.upcomingHarvestsIntro(crops.length),
+      items: crops.map(strings.upcomingHarvestItem),
+      quickReplies: strings.quickReplies.filter((q) => q !== "upcoming_harvests"),
+      quickReplyLabels: strings.quickReplyLabels,
+    });
+  } catch (error) {
+    console.error("Assistant upcoming harvests error:", error);
+    res.status(500).json({ message: "Error fetching upcoming harvests data" });
+  }
+};
+
+// @route   GET /api/assistant/highest-expenses
+const getHighestExpensesAssistant = async (req, res) => {
+  try {
+    const lang = getLang(req);
+    const strings = t[lang];
+    const userId = new mongoose.Types.ObjectId(req.user._id);
+
+    const expenseAgg = await Expense.aggregate([
+      { $match: { user: userId, crop: { $ne: null } } },
+      { $group: { _id: "$crop", totalExpenses: { $sum: "$amount" }, expenseCount: { $sum: 1 } } },
+      { $sort: { totalExpenses: -1 } },
+      { $limit: 3 },
+      {
+        $lookup: {
+          from: "crops",
+          localField: "_id",
+          foreignField: "_id",
+          as: "cropDetails"
+        }
+      },
+      { $unwind: "$cropDetails" }
+    ]);
+
+    const items = expenseAgg.map(agg => 
+      strings.highestExpenseItem({
+        cropName: agg.cropDetails.cropName,
+        totalExpenses: agg.totalExpenses,
+        expenseCount: agg.expenseCount
+      })
+    );
+
+    res.json({
+      topic: "highest_expenses",
+      message: strings.highestExpenseIntro(items.length),
+      items,
+      quickReplies: strings.quickReplies.filter((q) => q !== "highest_expenses"),
+      quickReplyLabels: strings.quickReplyLabels,
+    });
+  } catch (error) {
+    console.error("Assistant highest expenses error:", error);
+    res.status(500).json({ message: "Error fetching highest expenses data" });
+  }
+};
+
 // @route   POST /api/assistant/chat
 const chatWithAssistant = async (req, res) => {
   try {
-    const lang = getLang(req);
+    let lang = getLang(req);
     const { message } = req.body;
+    const lowerMsg = (message || "").toLowerCase();
+
+    // Auto-detect language toggle dynamically
+    const tlWords = /(pinakamalaki|gastos|bayad|parating|lapit|ani|anihin|tanim|pananim|gawa|ginawa|buod|lahat|kumusta|kamusta|salamat|tulong|ano|meron)/;
+    const enWords = /(highest|big|expensive|cost|upcoming|soon|harvest|crop|plant|active|activity|recent|summary|overall|hello|thanks|thank)/;
     
-    if (!message) {
-      return res.status(400).json({ message: "Message is required" });
+    if (tlWords.test(lowerMsg) && !enWords.test(lowerMsg)) {
+      lang = "tl"; 
+      req.query.lang = "tl"; // Override UI string propagation
+    } else if (enWords.test(lowerMsg) && !tlWords.test(lowerMsg)) {
+      lang = "en";
+      req.query.lang = "en";
     }
 
-    if (!process.env.GEMINI_API_KEY) {
-      const errMessage = lang === "tl" 
-        ? "Kinakailangan mong ilagay ang iyong GEMINI_API_KEY sa backend .env file para gumana ako." 
-        : "You need to add your GEMINI_API_KEY to the backend .env file to use the AI chatbot.";
+    // Intent routing via broadened rules
+    if (/(hello|hi|hey|kumusta|kamusta|musta|gandang araw|good morning|morning|afternoon|evening)/.test(lowerMsg)) {
+      return await getGreeting(req, res);
+    }
+
+    if (/(thank|salamat|ty|thanks)/.test(lowerMsg)) {
       return res.json({
-        topic: "chat",
-        message: errMessage,
+        topic: "thanks",
+        message: lang === "tl" ? "Walang anuman, kaibigan! May iba pa ba akong maitutulong?" : "Walang anuman, kaibigan! Anything else I can do for ya?",
         items: [],
         quickReplies: t[lang].quickReplies,
         quickReplyLabels: t[lang].quickReplyLabels,
       });
     }
 
-    const userId = new mongoose.Types.ObjectId(req.user._id);
+    if (/(help|tulong|ano pwede|what can you|whatdo)/.test(lowerMsg)) {
+      const msg = lang === "tl" 
+        ? "Nandito ako para tulungan ka! Pwede mo akong tanungin tungkol sa iyong mga pananim, gastos, o mga aanihin. Subukan mong i-click ang mga buttons sa baba!"
+        : "Nandito ako to lend a hand! You can ask me about your crops, expenses, or upcoming harvests. Try clicking the choice buttons below!";
+      return res.json({
+        topic: "help",
+        message: msg,
+        items: [],
+        quickReplies: t[lang].quickReplies,
+        quickReplyLabels: t[lang].quickReplyLabels,
+      });
+    }
 
-    // Fetch broad context so AI knows what's going on
-    const [activeCropsCount, expenseAgg, harvestAgg] = await Promise.all([
-      Crop.countDocuments({ user: userId, status: "active" }),
-      Expense.aggregate([
-        { $match: { user: userId } },
-        { $group: { _id: null, total: { $sum: "$amount" } } },
-      ]),
-      Harvest.aggregate([
-        { $match: { user: userId } },
-        { $group: { _id: null, total: { $sum: "$totalValue" } } },
-      ]),
-    ]);
+    if (/(highest|pinakamalaki|mahal|pinaka mahal|big expense|laki ng gastos|pinakamagastos|malaki|laki|huge|mataas)/.test(lowerMsg)) {
+      return await getHighestExpensesAssistant(req, res);
+    }
+    if (/(expense|gastos|bayad|cost|bili|presyo|pera|magkano|spend|spent)/.test(lowerMsg)) {
+      return await getExpensesAssistant(req, res);
+    }
+    if (/(upcoming|parating|soon|lapit|harvest|ani|aanihin|kukunin|pitas|anihan)/.test(lowerMsg)) {
+      return await getUpcomingHarvestsAssistant(req, res);
+    }
+    if (/(crop|tanim|pananim|plant|active|bunga|halaman|tatanim)/.test(lowerMsg)) {
+      return await getCropsAssistant(req, res);
+    }
+    if (/(activity|aktibidad|gawa|ginawa|recent|huli|chores|trabaho)/.test(lowerMsg)) {
+      return await getActivitiesAssistant(req, res);
+    }
+    if (/(summary|buod|overall|lahat|kabuuan|total)/.test(lowerMsg)) {
+      return await getSummaryAssistant(req, res);
+    }
 
-    const activeCrops = await Crop.find({ user: userId, status: "active" })
-      .select("cropName variety expectedHarvestDate")
-      .limit(10); // cap to limit prompt size
-
-    const totalExpenses = expenseAgg[0]?.total || 0;
-    const totalHarvestValue = harvestAgg[0]?.total || 0;
-
-    const farmContext = `You are "Farmer Guide", a friendly and helpful AI assistant for the Smart Farm Assistant app.
-The user is talking to you. You are completely fluent in both English and Tagalog/Filipino.
-You should naturally reply in the same language the user speaks to you. If they ask you to speak in Tagalog, strictly do so.
-Keep your responses short, conversational, and very easy to read on a mobile device. Break your text into small paragraphs. Use emojis naturally.
-
-Here is the current live data about the user's farm:
-- Active Crops Count: ${activeCropsCount}
-- Active Crops Details: ${activeCrops.map(c => c.cropName + (c.variety ? ` (${c.variety})` : '')).join(', ') || 'None'}
-- Total Expenses: ₱${totalExpenses.toLocaleString()}
-- Total Harvest Value: ₱${totalHarvestValue.toLocaleString()}
-- User's name: ${req.user.name || "Farmer"}
-
-Answer the user's question directly using this context. If they ask a general farming question, answer it concisely. If their question is unrelated to farming or their farm data, playfully steer them back to farming topics.`;
-
-    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-    const prompt = farmContext + "\n\nUser Question:\n" + message;
-
-    const aiRes = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
-    });
+    // Unrecognized intent -> Send to Gemini
+    const geminiReply = await callGeminiAPI(message, req.user._id);
+    const fallbackStr = geminiReply || t[lang].fallbackMessage;
 
     res.json({
-      topic: "chat",
-      message: aiRes.text,
+      topic: "fallback",
+      message: fallbackStr,
       items: [],
-      // Refresh quick replies so they remain available after chat
+      // Refresh quick replies
       quickReplies: t[lang].quickReplies,
       quickReplyLabels: t[lang].quickReplyLabels,
     });
   } catch (error) {
     console.error("Assistant chat error:", error);
-    res.status(500).json({ message: "Error communicating with AI" });
+    res.status(500).json({ message: "Error processing the chat" });
   }
 };
 
@@ -432,5 +589,7 @@ module.exports = {
   getExpensesAssistant,
   getHarvestsAssistant,
   getSummaryAssistant,
+  getUpcomingHarvestsAssistant,
+  getHighestExpensesAssistant,
   chatWithAssistant,
 };

@@ -63,3 +63,13 @@ export const postAssistantChat = async (message, lang = "en") => {
   const { data } = await API.post(`/assistant/chat?lang=${lang}`, { message });
   return data;
 };
+
+export const getAssistantUpcomingHarvests = async (lang = "en") => {
+  const { data } = await API.get(`/assistant/upcoming-harvests?lang=${lang}`);
+  return data;
+};
+
+export const getAssistantHighestExpenses = async (lang = "en") => {
+  const { data } = await API.get(`/assistant/highest-expenses?lang=${lang}`);
+  return data;
+};

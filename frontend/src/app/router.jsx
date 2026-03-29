@@ -14,6 +14,7 @@ import AddExpense from "../pages/AddExpense";
 import AddActivity from "../pages/AddActivity";
 import Harvests from "../pages/Harvests";
 import AddHarvest from "../pages/AddHarvest";
+import Reports from "../pages/Reports";
 
 function Router() {
   return (
@@ -124,6 +125,15 @@ function Router() {
           element={
             <ProtectedRoute>
               <Profile />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/reports"
+          element={
+            <ProtectedRoute>
+              <Reports />
             </ProtectedRoute>
           }
         />

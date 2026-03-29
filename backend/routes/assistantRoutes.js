@@ -9,6 +9,8 @@ const {
   getHarvestsAssistant,
   getSummaryAssistant,
   chatWithAssistant,
+  getUpcomingHarvestsAssistant,
+  getHighestExpensesAssistant,
 } = require("../controllers/assistantController");
 
 // All assistant routes are protected
@@ -19,6 +21,8 @@ router.get("/activities",  protect, getActivitiesAssistant);
 router.get("/expenses",    protect, getExpensesAssistant);
 router.get("/harvests",    protect, getHarvestsAssistant);
 router.get("/summary",     protect, getSummaryAssistant);
+router.get("/upcoming-harvests", protect, getUpcomingHarvestsAssistant);
+router.get("/highest-expenses", protect, getHighestExpensesAssistant);
 router.post("/chat",       protect, chatWithAssistant);
 
 module.exports = router;

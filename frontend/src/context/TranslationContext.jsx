@@ -153,10 +153,41 @@ const translations = {
     deleting: "Deleting...",
     viewDetails: "View Details",
     
-    // NPC (Additional UI)
+    // NPC & Reports
     assistantTitle: "Smart Assistant",
     assistantSub: "Advanced AI Farmer Guide",
     quickActions: "Quick Prompts",
+    reportsTitle: "Reports & Export",
+    toolsLabel: "Tools",
+    harvestReport: "Harvest Summary",
+    costReport: "Crop Cost Summary",
+    printBtn: "Print / PDF",
+    summaryReport: "Farm Summary Report",
+    totalLabel: "Total",
+
+    // Missing Dashboard Words
+    cropsNAttention: "Crops Needing Attention",
+    actionRequired: "Action Required",
+    inactive7: "Inactive for 7+ days",
+    harvestAppr: "Harvest approaching",
+    overdue: "Overdue",
+    today: "Today",
+    inTime: "in",
+    daysShort: "d",
+    mainField: "Main Field",
+    latestExpenses: "Latest Expenses",
+    cropPerf: "Crop Performance",
+    mostActive: "Most Active",
+    activitiesCount: "Activities",
+    harvestValShort: "Harvest Val",
+    expensesShort: "Expenses",
+    netEstimate: "Net Estimate",
+    noActiveCrops: "No active crops to analyze",
+    noRecentExpenses: "No recent expenses",
+    onWord: "On",
+    forWord: "For",
+    generalFarming: "General Farming",
+    generalCat: "General",
   },
   tl: {
     // Nav & Common
@@ -309,10 +340,41 @@ const translations = {
     deleting: "Binubura...",
     viewDetails: "Tingnan ang Detalye",
 
-    // NPC
+    // NPC & Reports
     assistantTitle: "Smart Assistant",
     assistantSub: "Modernong AI Gabay",
     quickActions: "Mabilisang Tanong",
+    reportsTitle: "Ulat & Export PDF",
+    toolsLabel: "Mga Tool",
+    harvestReport: "Buod ng mga Ani",
+    costReport: "Buod ng Gastos",
+    printBtn: "I-print / PDF",
+    summaryReport: "Buod na Ulat ng Bukid",
+    totalLabel: "Kabuuan",
+
+    // Missing Dashboard Words
+    cropsNAttention: "Pananim na Nangangailangan ng Pansin",
+    actionRequired: "Kailangang Aksyunan",
+    inactive7: "Walang aktibidad ng 7+ araw",
+    harvestAppr: "Malapit nang anihin",
+    overdue: "Lampas na",
+    today: "Ngayon",
+    inTime: "sa loob ng",
+    daysShort: "araw",
+    mainField: "Pangunahing Bukid",
+    latestExpenses: "Kamakailang Gastos",
+    cropPerf: "Pagsusuri ng Pananim",
+    mostActive: "Pinaka-aktibo",
+    activitiesCount: "Aktibidad",
+    harvestValShort: "Halaga (Ani)",
+    expensesShort: "Gastos",
+    netEstimate: "Tinatayang Kita",
+    noActiveCrops: "Walang aktibong pananim na masusuri",
+    noRecentExpenses: "Walang kamakailang gastos",
+    onWord: "Sa",
+    forWord: "Para sa",
+    generalFarming: "Pangkalahatang Pagsasaka",
+    generalCat: "Pangkalahatan",
   }
 };
 

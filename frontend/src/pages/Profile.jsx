@@ -4,7 +4,7 @@ import MobileLayout from "../components/MobileLayout";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { useTranslation } from "../context/TranslationContext";
-import { LogOut, User, Mail, Globe, Palette, Loader2 } from "lucide-react";
+import { LogOut, User, Mail, Globe, Palette, Loader2, FileBarChart, ChevronRight } from "lucide-react";
 
 function Profile() {
   const { user, logout, updatePreferences } = useAuth();
@@ -68,6 +68,34 @@ function Profile() {
                 <p className="truncate text-base font-bold text-slate-800 dark:text-slate-100">{user?.email}</p>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Tools & Reports */}
+        <div className="overflow-hidden rounded-[2rem] border border-white/40 bg-white/70 p-5 shadow-sm backdrop-blur-xl dark:border-slate-800/50 dark:bg-slate-900/50">
+          <h2 className="mb-4 text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            {t("toolsLabel")}
+          </h2>
+          <div className="space-y-3">
+            <button
+              onClick={() => navigate("/reports")}
+              className="group flex w-full items-center justify-between rounded-2xl bg-emerald-50/50 p-4 transition-colors hover:bg-emerald-100/50 dark:bg-emerald-900/10 dark:hover:bg-emerald-900/20"
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">
+                  <FileBarChart size={20} />
+                </div>
+                <div className="text-left">
+                  <span className="block font-bold text-slate-800 dark:text-slate-100">
+                    {t("reportsTitle")}
+                  </span>
+                  <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                    View & Export PDF
+                  </span>
+                </div>
+              </div>
+              <ChevronRight size={18} className="text-slate-400 transition-transform group-hover:translate-x-1 dark:text-slate-500" />
+            </button>
           </div>
         </div>
 

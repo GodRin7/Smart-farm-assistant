@@ -28,6 +28,41 @@ body {
   background-color: #cbd5e1;
   border-radius: 20px;
 }
-.dark ::-webkit-scrollbar-thumb {
-  background-color: #334155;
+
+@keyframes float-breathe {
+  0%, 100% { transform: translateY(0) scale(1.0); }
+  50% { transform: translateY(-8px) scale(1.02); }
+}
+.animate-float-breathe {
+  animation: float-breathe 4s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+@keyframes slide-up-fade {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-slide-up {
+  animation: slide-up-fade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes blink-caret {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.animate-blink-caret {
+  animation: blink-caret 1s step-end infinite;
+}
+
+@media print {
+  header, nav, button[aria-label="Open Farmer Guide"], .print-hidden, [class*="fixed"] {
+    display: none !important;
+  }
+  body, main {
+    background: white !important;
+    background-color: white !important;
+    color: black !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
 }
