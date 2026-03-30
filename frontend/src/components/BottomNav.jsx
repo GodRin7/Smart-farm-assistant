@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Sprout, Wallet, ClipboardList, User } from "lucide-react";
+import { Home, Sprout, CalendarDays, Wallet, User } from "lucide-react";
 import { useTranslation } from "../context/TranslationContext";
 
 function BottomNav() {
@@ -9,7 +9,7 @@ function BottomNav() {
   const navItems = [
     { name: t("dashboard"), path: "/dashboard", icon: Home },
     { name: t("crops"), path: "/crops", icon: Sprout },
-    { name: t("harvests"), path: "/harvests", icon: ClipboardList },
+    { name: t("farmCalendar", "Calendar"), path: "/calendar", icon: CalendarDays },
     { name: t("expenses"), path: "/expenses", icon: Wallet },
     { name: t("profile"), path: "/profile", icon: User },
   ];

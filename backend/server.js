@@ -35,6 +35,7 @@ app.use("/api/activities",require("./routes/activityRoutes"));
 app.use("/api/harvests",  require("./routes/harvestRoutes"));
 app.use("/api/dashboard", require("./routes/dashboardRoutes"));
 app.use("/api/assistant", require("./routes/assistantRoutes"));
+app.use("/api/schedules", require("./routes/scheduleRoutes"));
 
 // Global error handler
 app.use((err, req, res, next) => {
