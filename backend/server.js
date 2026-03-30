@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
+const https = require("https");
 
 dotenv.config();
 connectDB();
@@ -45,4 +46,17 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  
+  // Render Free-Tier Keep-Alive Ping (Runs every 10 minutes)
+  const RENDER_EXTERNAL_URL = process.env.RENDER_EXTERNAL_URL;
+  if (RENDER_EXTERNAL_URL) {
+    console.log(`Keep-alive service initialized for ${RENDER_EXTERNAL_URL}`);
+    setInterval(() => {
+      https.get(RENDER_EXTERNAL_URL, (res) => {
+        console.log(`Keep-alive ping successful: ${res.statusCode}`);
+      }).on('error', (e) => {
+        console.error(`Keep-alive ping failed: ${e.message}`);
+      });
+    }, 10 * 60 * 1000); // 10 minutes
+  }
 });
