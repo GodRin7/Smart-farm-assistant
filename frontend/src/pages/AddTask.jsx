@@ -4,6 +4,7 @@ import MobileLayout from "../components/MobileLayout";
 import { createSchedule } from "../api/scheduleApi";
 import { getCrops } from "../api/cropApi";
 import { useTranslation } from "../context/TranslationContext";
+import VoiceButton from "../components/VoiceButton";
 
 const TASK_TYPES = ["watering", "fertilizing", "spraying", "weeding", "harvesting", "other"];
 const REPEAT_TYPES = ["none", "daily", "weekly", "biweekly"];
@@ -91,14 +92,21 @@ function AddTask() {
               <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
                 {t("taskTitleLabel", "Custom Title (optional)")}
               </label>
-              <input
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                placeholder={t("taskTitlePlaceholder", "e.g. Morning Watering Run")}
-                className={inputClass}
-              />
+              <div className="relative flex items-center gap-2">
+                <input
+                  type="text"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  placeholder={t("taskTitlePlaceholder", "e.g. Morning Watering Run")}
+                  className={inputClass + " flex-1"}
+                />
+                <VoiceButton
+                  lang={lang === "tl" ? "fil-PH" : "en-US"}
+                  onResult={(text) => setFormData(p => ({ ...p, title: p.title ? p.title + " " + text : text }))}
+                  className="h-12 w-12 shrink-0 border border-emerald-200 dark:border-emerald-800/50"
+                />
+              </div>
             </div>
 
             {/* Linked Crop */}
@@ -146,14 +154,23 @@ function AddTask() {
               <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
                 {t("notesLabel")}
               </label>
-              <textarea
-                name="notes"
-                value={formData.notes}
-                onChange={handleChange}
-                rows="3"
-                placeholder="..."
-                className={inputClass}
-              />
+              <div className="relative">
+                <textarea
+                  name="notes"
+                  value={formData.notes}
+                  onChange={handleChange}
+                  rows="3"
+                  placeholder="..."
+                  className={inputClass}
+                />
+                <div className="absolute bottom-3 right-3">
+                  <VoiceButton
+                    lang={lang === "tl" ? "fil-PH" : "en-US"}
+                    onResult={(text) => setFormData(p => ({ ...p, notes: p.notes ? p.notes + " " + text : text }))}
+                    className="h-9 w-9 border border-emerald-200 dark:border-emerald-800/50 shadow-sm"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>

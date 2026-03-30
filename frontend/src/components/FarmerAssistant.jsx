@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { X, Send, Sparkles, Sprout, ListFilter, TrendingDown, TrendingUp, Calendar, ArrowRight } from "lucide-react";
+import VoiceButton from "./VoiceButton";
 import { useAuth } from "../context/AuthContext";
 import { useTranslation } from "../context/TranslationContext";
 import farmerAvatar from "../assets/farmer_npc.png";
@@ -302,11 +303,16 @@ function FarmerAssistant() {
               onSubmit={handleChatSubmit}
               className="flex items-end gap-3 w-full"
             >
+              <VoiceButton
+                lang={lang === "tl" ? "fil-PH" : "en-US"}
+                onResult={(text) => setInputText(prev => prev ? prev + " " + text : text)}
+                className="h-14 w-14 shrink-0 border-2 border-emerald-200 dark:border-emerald-800/50"
+              />
               <input
                 type="text"
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                placeholder={lang === "tl" ? "Magtanong pa rito..." : "Type custom question..."}
+                placeholder={lang === "tl" ? "Magtanong pa rito..." : "Type or speak a question..."}
                 className="h-14 w-full rounded-2xl border-2 border-slate-200/80 bg-white px-5 text-base font-semibold text-slate-800 outline-none transition focus:border-amber-400 focus:ring-4 focus:ring-amber-400/10 dark:border-slate-800 dark:bg-[#14120e] dark:text-slate-200 dark:focus:border-amber-500"
                 disabled={loading}
               />
