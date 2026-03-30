@@ -4,15 +4,17 @@ import MobileLayout from "../components/MobileLayout";
 import StatusBadge from "../components/StatusBadge";
 import { deleteCrop, getCropById } from "../api/cropApi";
 import { useTranslation } from "../context/TranslationContext";
-import { RefreshCw, MapPin, Calendar, CheckCircle2, FileText, Trash2, Edit } from "lucide-react";
+import { RefreshCw, MapPin, Calendar, CheckCircle2, FileText, Trash2, Edit, Activity, ThermometerSun } from "lucide-react";
+import { getCropIntelligence } from "../utils/cropIntelligence";
 
 function CropDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { t, lang } = useTranslation();
   const locale = lang === "tl" ? "fil-PH" : "en-US";
-
   const [crop, setCrop] = useState(null);
+  
+  const intel = crop ? getCropIntelligence(crop) : null;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [deleting, setDeleting] = useState(false);
@@ -95,6 +97,62 @@ function CropDetails() {
             <StatusBadge status={crop.status} />
           </div>
         </div>
+
+        {/* Crop Intelligence Engine */}
+        {intel && crop.status !== "failed" && (
+          <div className="relative overflow-hidden rounded-[2rem] border border-emerald-200/60 bg-gradient-to-br from-emerald-50/80 to-emerald-100/40 p-6 shadow-sm dark:border-emerald-900/40 dark:from-emerald-900/20 dark:to-[#0f172a]">
+            {/* Background design */}
+            <Activity className="absolute -right-4 -top-4 h-32 w-32 rotate-12 text-emerald-300/30 dark:text-emerald-800/20" />
+            
+            <div className="relative z-10 flex items-center justify-between">
+              <h3 className="flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-emerald-800 dark:text-emerald-400">
+                <ThermometerSun size={16} /> {t("smartIntelligence")}
+              </h3>
+              
+              <div className={`flex items-center gap-1.5 rounded-full px-3 py-1 shadow-sm ${intel.healthBg} ${intel.healthBorder} border`}>
+                <span className="text-[14px] drop-shadow-sm">{intel.healthEmoji}</span>
+                <span className={`text-[10px] font-black uppercase tracking-wider ${intel.healthColor}`}>
+                  {t(intel.healthKey)}
+                </span>
+              </div>
+            </div>
+
+            <div className="relative z-10 mt-6">
+              <div className="mb-3 flex items-end justify-between">
+                <div>
+                  <p className="text-2xl font-black tracking-tight text-slate-800 dark:text-slate-100">
+                    {t(intel.stageKey)}
+                  </p>
+                  <p className="mt-0.5 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    {t("progressValue")}: {Math.floor(intel.progress)}%
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-black text-amber-600 dark:text-amber-500">
+                    {intel.isHarvested ? "—" : intel.daysRemaining}
+                  </p>
+                  <p className="mt-0.5 text-xs font-bold uppercase tracking-wider text-amber-600/70 dark:text-amber-500/70">
+                    {t("daysRemaining")}
+                  </p>
+                </div>
+              </div>
+              
+              {/* Progress Bar Container */}
+              <div className="relative mt-5 h-3 w-full overflow-hidden rounded-full bg-slate-200/70 shadow-inner dark:bg-slate-800/80">
+                 <div 
+                   className="absolute left-0 top-0 h-full rounded-full bg-gradient-to-r from-emerald-400 via-emerald-300 to-amber-400 transition-all duration-1000 ease-out" 
+                   style={{ width: `${intel.progress}%` }} 
+                 />
+              </div>
+              
+              {/* Stage markers */}
+              <div className="mt-2.5 flex justify-between text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-500">
+                <span>{t("stageSeedling")}</span>
+                <span>{t("stageHarvestReady")}</span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Info Cards */}
         <div className="grid grid-cols-2 gap-3">

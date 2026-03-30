@@ -188,6 +188,21 @@ const translations = {
     forWord: "For",
     generalFarming: "General Farming",
     generalCat: "General",
+
+    // Intelligence Engine
+    stageSeedling: "Seedling Stage",
+    stageVegetative: "Vegetative Stage",
+    stageMaturing: "Maturing Phase",
+    stageHarvestReady: "Harvest Ready",
+    healthHealthy: "Healthy",
+    healthMonitor: "Needs Monitoring",
+    healthAtRisk: "At Risk",
+    healthCompleted: "Completed",
+    healthPlanned: "Planned",
+    smartIntelligence: "Crop Intelligence",
+    daysPassed: "Days Passed",
+    daysRemaining: "Days Until Harvest",
+    progressValue: "Growth Progress",
   },
   tl: {
     // Nav & Common
@@ -375,6 +390,21 @@ const translations = {
     forWord: "Para sa",
     generalFarming: "Pangkalahatang Pagsasaka",
     generalCat: "Pangkalahatan",
+
+    // Intelligence Engine
+    stageSeedling: "Yugtong Binhi (Seedling)",
+    stageVegetative: "Yugtong Vegetative",
+    stageMaturing: "Nagkakamit (Maturing)",
+    stageHarvestReady: "Handa Nang Anihin",
+    healthHealthy: "Malusog",
+    healthMonitor: "Kailangang Bantayan",
+    healthAtRisk: "Nanganib (At Risk)",
+    healthCompleted: "Tapos Na",
+    healthPlanned: "Nakaplano",
+    smartIntelligence: "Pagsusuri ng Pananim",
+    daysPassed: "Araw Mula Naitanim",
+    daysRemaining: "Araw Bago Anihin",
+    progressValue: "Laki at Pag-unlad",
   }
 };
 

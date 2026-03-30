@@ -2,10 +2,12 @@ import { Link } from "react-router-dom";
 import StatusBadge from "./StatusBadge";
 import { Calendar, Sprout, ArrowRight } from "lucide-react";
 import { useTranslation } from "../context/TranslationContext";
+import { getCropIntelligence } from "../utils/cropIntelligence";
 
 function CropCard({ crop }) {
   const { t, lang } = useTranslation();
   const locale = lang === "tl" ? "fil-PH" : "en-US";
+  const intel = getCropIntelligence(crop);
 
   return (
     <div className="group relative overflow-hidden rounded-[2rem] border border-white/40 bg-white/70 p-5 shadow-sm backdrop-blur-xl transition-all hover:border-emerald-200 hover:shadow-md dark:border-slate-800/50 dark:bg-slate-900/50 dark:hover:border-emerald-800/50">
@@ -24,6 +26,27 @@ function CropCard({ crop }) {
 
         <StatusBadge status={crop.status} />
       </div>
+
+      {/* Intelligence Row */}
+      {intel && crop.status !== "failed" && (
+        <div className="mt-4 flex items-center justify-between rounded-xl border border-emerald-100/50 bg-emerald-50/30 px-3 py-2.5 shadow-sm backdrop-blur-md dark:border-emerald-900/30 dark:bg-emerald-900/10">
+           <div className="flex items-center gap-1.5">
+             <span className="text-[13px] drop-shadow-sm">{intel.healthEmoji}</span>
+             <span className={`text-[10px] font-black uppercase tracking-wider ${intel.healthColor}`}>
+               {t(intel.healthKey)}
+             </span>
+           </div>
+           
+           <div className="flex items-center gap-2">
+             <div className="h-1.5 w-10 overflow-hidden rounded-full bg-slate-200/60 dark:bg-slate-700/50">
+               <div className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-amber-400" style={{ width: `${intel.progress}%` }} />
+             </div>
+             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+               {t(intel.stageKey)}
+             </span>
+           </div>
+        </div>
+      )}
 
       <div className="mt-5 mb-4 grid grid-cols-2 gap-3 rounded-2xl bg-slate-50/50 p-3 dark:bg-[#0f172a]/50">
         <div>
