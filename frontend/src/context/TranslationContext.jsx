@@ -203,6 +203,22 @@ const translations = {
     daysPassed: "Days Passed",
     daysRemaining: "Days Until Harvest",
     progressValue: "Growth Progress",
+    
+    // Alerts
+    smartAlertsTitle: "Action Center",
+    inactiveAlertTitle: "Crop Inactivity Warning",
+    inactiveAlertMsg: "No action recorded for 7+ days. Consider logging watering or fertilizing.",
+    harvestAlertTitle: "Harvest Approaching",
+    harvestAlertMsg: "Expected harvest window is active! Prepare your harvesting plan now.",
+    overdueAlertTitle: "Past Expected Harvest",
+    overdueAlertMsg: "This crop has passed its expected harvest date! Update status immediately to prevent loss.",
+    expenseAlertTitle: "Expense Warning",
+    expenseAlertMsg: "Current expenses exceed 90% of your Estimated Revenue. Profit at risk!",
+    weatherRainTitle: "Heavy Rain Forecast",
+    weatherRainMsg: "Risk of waterlogging. Check drainage systems.",
+    weatherHeatTitle: "Extreme Heat Warning",
+    weatherHeatMsg: "Intense heat expected today. Schedule deep watering to prevent stress.",
+    estRevenueLabel: "Estimated Revenue (Optional)",
   },
   tl: {
     // Nav & Common
@@ -405,6 +421,22 @@ const translations = {
     daysPassed: "Araw Mula Naitanim",
     daysRemaining: "Araw Bago Anihin",
     progressValue: "Laki at Pag-unlad",
+
+    // Alerts
+    smartAlertsTitle: "Mga Paalala",
+    inactiveAlertTitle: "Babala sa Inaktibidad",
+    inactiveAlertMsg: "Walang tala ng aksyon higit 7 araw na. Mag-record na ng pagdidilig o pag-aabono.",
+    harvestAlertTitle: "Malapit Nang Anihin",
+    harvestAlertMsg: "Nakalinya na para anihin! Ihanda na ang iyong mga kagamitan.",
+    overdueAlertTitle: "Lagpas na sa Ani",
+    overdueAlertMsg: "Lagpas na sa petsa ng ani! I-update ang status upang maiwasan ang pagkasira.",
+    expenseAlertTitle: "Babala sa Gastos",
+    expenseAlertMsg: "Ang gastos ay lumampas na sa 90% ng inaasahang kita. Panganib sa negosyo!",
+    weatherRainTitle: "Babala ng Malakas na Ulan",
+    weatherRainMsg: "Banta ng pagbaha. Suriin ang mga daluyan ng tubig.",
+    weatherHeatTitle: "Sukdulang Init",
+    weatherHeatMsg: "Matinding init ngayon. Agapan ang malalim na pagdidilig.",
+    estRevenueLabel: "Inaasahang Kita (Opsyonal)",
   }
 };
 

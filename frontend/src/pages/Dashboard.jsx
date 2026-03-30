@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import MobileLayout from "../components/MobileLayout";
 import { getDashboard } from "../api/dashboardApi";
-import { Leaf, CalendarClock, Banknote, TrendingUp, ChevronRight, Sprout, ShoppingCart, RefreshCw, AlertTriangle, Clock, CheckCircle2, Wallet, PackageOpen, Activity, Info, BarChart3, TrendingDown } from "lucide-react";
+import { Leaf, CalendarClock, Banknote, TrendingUp, ChevronRight, Sprout, ShoppingCart, RefreshCw, AlertTriangle, Clock, CheckCircle2, Wallet, PackageOpen, Activity, Info, BarChart3, TrendingDown, Bell, CloudRain, ThermometerSun } from "lucide-react";
 import { useTranslation } from "../context/TranslationContext";
 
 function Dashboard() {
@@ -49,7 +49,7 @@ function Dashboard() {
     );
   }
 
-  const { summary, recentActivities, latestExpenses, upcomingHarvests, analytics } = dashboard;
+  const { summary, recentActivities, latestExpenses, upcomingHarvests, smartAlerts, analytics } = dashboard;
 
   const getUrgency = (expectedDate) => {
     const diffTime = new Date(expectedDate) - new Date();
@@ -65,8 +65,28 @@ function Dashboard() {
     return keyMap[type] ? t(keyMap[type]) : type.replaceAll("_", " ");
   };
 
+  const unreadAlertsCount = smartAlerts?.length || 0;
+
+  const RightAction = () => (
+    <div className="relative">
+      <button 
+        onClick={() => {
+          const el = document.getElementById("action-center");
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }}
+        className="relative overflow-hidden rounded-xl border border-slate-200 bg-white/50 px-3 py-2 text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:shadow dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-300 dark:hover:bg-slate-800 flex items-center justify-center">
+        <Bell size={20} />
+      </button>
+      {unreadAlertsCount > 0 && (
+         <div className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-red-500 text-[10px] font-bold text-white shadow-sm dark:border-slate-900 border-opacity-50">
+           {unreadAlertsCount}
+         </div>
+      )}
+    </div>
+  );
+
   return (
-    <MobileLayout title={t("dashboard")}>
+    <MobileLayout title={t("dashboard")} rightAction={<RightAction />}>
       <div className="space-y-8 pb-6">
         
         {/* Welcome Header */}
@@ -124,25 +144,57 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* Crops Needing Attention */}
-        {analytics?.cropsNeedingAttention?.length > 0 && (
-          <div className="rounded-[1.5rem] border border-rose-200/60 bg-rose-50 p-5 shadow-sm dark:border-rose-900/40 dark:bg-rose-900/20">
-            <h3 className="mb-3 flex items-center gap-2 text-base font-bold text-rose-800 dark:text-rose-300">
-              <AlertTriangle size={20} className="text-rose-600 dark:text-rose-400" />
-              {t("cropsNAttention")}
+        {/* Smart Alerts Action Center */}
+        {smartAlerts?.length > 0 && (
+          <div id="action-center" className="scroll-mt-24 pb-2">
+            <h3 className="mb-4 flex items-center gap-2 text-lg font-black tracking-tight text-slate-800 dark:text-slate-100 px-1">
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400">
+                <Bell size={18} />
+              </span>
+              {t("smartAlertsTitle")}
             </h3>
-            <div className="space-y-3">
-              {analytics.cropsNeedingAttention.map((crop) => (
-                <div key={crop._id} className="flex flex-col gap-1 rounded-xl bg-white/60 p-3 shadow-sm dark:bg-slate-900/50">
-                  <div className="flex justify-between items-center">
-                    <span className="font-bold text-slate-800 dark:text-slate-100">{crop.cropName}</span>
-                    <span className="text-[10px] uppercase tracking-wide font-bold text-rose-600 dark:text-rose-400 bg-rose-100 dark:bg-rose-900/40 px-2 py-1 rounded-md">
-                      {t("actionRequired")}
-                    </span>
+            
+            <div className="flex snap-x snap-mandatory overflow-x-auto pb-4 gap-4 px-1 hide-scrollbar" style={{ scrollbarWidth: 'none' }}>
+              {smartAlerts.map((alert) => (
+                <div key={alert.id} className={`shrink-0 snap-center relative w-[85%] rounded-[2rem] border shadow-md p-5 ${
+                  alert.color === 'rose' ? 'bg-gradient-to-br from-rose-50 to-red-100/50 border-rose-200 dark:from-red-900/30 dark:to-rose-950/40 dark:border-red-800/50' :
+                  alert.color === 'amber' ? 'bg-gradient-to-br from-amber-50 to-orange-100/50 border-amber-200 dark:from-orange-900/30 dark:to-amber-950/40 dark:border-orange-800/50' :
+                  alert.color === 'emerald' ? 'bg-gradient-to-br from-emerald-50 to-green-100/50 border-emerald-200 dark:from-green-900/30 dark:to-emerald-950/40 dark:border-green-800/50' :
+                  'bg-gradient-to-br from-blue-50 to-indigo-100/50 border-blue-200 dark:from-blue-900/30 dark:to-indigo-950/40 dark:border-blue-800/50'
+                }`}>
+                  <div className="relative z-10">
+                    <div className="flex justify-between items-start mb-3">
+                       <h4 className={`text-base font-bold leading-tight pr-4 ${
+                         alert.color === 'rose' ? 'text-rose-900 dark:text-rose-300' :
+                         alert.color === 'amber' ? 'text-amber-900 dark:text-amber-300' :
+                         alert.color === 'emerald' ? 'text-emerald-900 dark:text-emerald-300' :
+                         'text-blue-900 dark:text-blue-300'
+                       }`}>
+                         {t(alert.title)}
+                       </h4>
+                       <span className={`flex shrink-0 h-8 w-8 items-center justify-center rounded-full shadow-sm bg-white/60 dark:bg-black/20 backdrop-blur-md ${
+                         alert.color === 'rose' ? 'text-rose-600 dark:text-rose-400' :
+                         alert.color === 'amber' ? 'text-amber-600 dark:text-amber-400' :
+                         alert.color === 'emerald' ? 'text-emerald-600 dark:text-emerald-400' :
+                         'text-blue-600 dark:text-blue-400'
+                       }`}>
+                         {alert.icon === 'AlertTriangle' ? <AlertTriangle size={16}/> : alert.icon === 'Clock' ? <Clock size={16}/> : alert.icon === 'CheckCircle2' ? <CheckCircle2 size={16} /> : alert.icon === 'Banknote' ? <Banknote size={16} /> : alert.icon === 'ThermometerSun' ? <ThermometerSun size={16}/> : alert.icon === 'CloudRain' ? <CloudRain size={16}/> : <Info size={16}/>}
+                       </span>
+                    </div>
+                    <p className={`text-[13px] font-semibold leading-relaxed mb-4 opacity-90 ${
+                         alert.color === 'rose' ? 'text-rose-800 dark:text-rose-200' :
+                         alert.color === 'amber' ? 'text-amber-800 dark:text-amber-200' :
+                         alert.color === 'emerald' ? 'text-emerald-800 dark:text-emerald-200' :
+                         'text-blue-800 dark:text-blue-200'
+                       }`}>
+                      {t(alert.message)}
+                    </p>
+                    {alert.cropName && (
+                      <div className="inline-flex py-1.5 px-3 rounded-xl bg-white/50 dark:bg-black/20 text-[10px] font-black shadow-sm uppercase tracking-wider">
+                        {alert.cropName}
+                      </div>
+                    )}
                   </div>
-                  <p className="text-xs font-semibold text-slate-600 dark:text-slate-400 mt-1">
-                    {crop.attentionReason.map(r => t(r)).join(" • ")}
-                  </p>
                 </div>
               ))}
             </div>

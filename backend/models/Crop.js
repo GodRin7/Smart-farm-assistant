@@ -43,6 +43,10 @@ const cropSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    estimatedRevenue: {
+      type: Number,
+      default: 0,
+    },
     status: {
       type: String,
       enum: ["active", "harvested", "failed"],

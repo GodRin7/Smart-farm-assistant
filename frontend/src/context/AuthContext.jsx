@@ -74,6 +74,12 @@ export const AuthProvider = ({ children }) => {
     }
   }, [user]);
 
+  // Proactive Backend Wakeup (For Free-Tier Render Services)
+  useEffect(() => {
+    const wakeupUrl = (API.defaults.baseURL || "http://localhost:5000/api").replace("/api", "/");
+    fetch(wakeupUrl).catch(() => {});
+  }, []);
+
   return (
     <AuthContext.Provider value={{ user, loading, register, login, logout, updatePreferences }}>
       {children}

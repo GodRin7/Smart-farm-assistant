@@ -54,6 +54,7 @@ const createCrop = async (req, res) => {
       areaUnit,
       plantedDate,
       expectedHarvestDate,
+      estimatedRevenue,
       notes,
     } = req.body;
 
@@ -72,6 +73,7 @@ const createCrop = async (req, res) => {
       areaUnit,
       plantedDate,
       expectedHarvestDate,
+      estimatedRevenue,
       notes,
     });
 

@@ -94,6 +94,7 @@ const getDashboard = async (req, res) => {
           plotName: 1,
           status: 1,
           expectedHarvestDate: 1,
+          estimatedRevenue: 1,
           totalExpenses: { $sum: "$cropExpenses.amount" },
           totalHarvestValue: { $sum: "$cropHarvests.totalValue" },
           activityCount: { $size: "$cropActivities" },
@@ -110,6 +111,7 @@ const getDashboard = async (req, res) => {
 
     let mostActiveCropId = null;
     let maxActivities = -1;
+    const smartAlerts = [];
 
     const cropAnalytics = cropAnalyticsRaw.map(crop => {
       const netEstimate = (crop.totalHarvestValue || 0) - (crop.totalExpenses || 0);
@@ -117,16 +119,64 @@ const getDashboard = async (req, res) => {
       let needsAttention = false;
       let attentionReason = [];
       
-      // Activity rule
-      if (!crop.latestActivity || new Date(crop.latestActivity) < sevenDaysAgo) {
-        needsAttention = true;
-        attentionReason.push("inactive7");
-      }
-      
-      // Harvest rule
-      if (crop.expectedHarvestDate && new Date(crop.expectedHarvestDate) <= next5Days) {
-        needsAttention = true;
-        attentionReason.push("harvestAppr");
+      if (crop.status === "active") {
+        // Activity rule
+        if (!crop.latestActivity || new Date(crop.latestActivity) < sevenDaysAgo) {
+          needsAttention = true;
+          attentionReason.push("inactive7");
+          smartAlerts.push({
+            id: `inact-${crop._id}`,
+            type: "warning",
+            title: "inactiveAlertTitle",
+            message: "inactiveAlertMsg",
+            cropName: crop.cropName,
+            color: "amber",
+            icon: "Clock"
+          });
+        }
+        
+        // Harvest rule
+        if (crop.expectedHarvestDate) {
+          const exp = new Date(crop.expectedHarvestDate);
+          if (exp <= next5Days && exp >= today) {
+            needsAttention = true;
+            attentionReason.push("harvestAppr");
+            smartAlerts.push({
+              id: `harv-${crop._id}`,
+              type: "success",
+              title: "harvestAlertTitle",
+              message: "harvestAlertMsg",
+              cropName: crop.cropName,
+              color: "emerald",
+              icon: "CheckCircle2"
+            });
+          } else if (exp < today) {
+            needsAttention = true;
+            attentionReason.push("overdue");
+            smartAlerts.push({
+              id: `over-${crop._id}`,
+              type: "error",
+              title: "overdueAlertTitle",
+              message: "overdueAlertMsg",
+              cropName: crop.cropName,
+              color: "rose",
+              icon: "AlertTriangle"
+            });
+          }
+        }
+
+        // Expense Risk Rule
+        if (crop.estimatedRevenue > 0 && crop.totalExpenses >= crop.estimatedRevenue * 0.9) {
+          smartAlerts.push({
+            id: `exp-${crop._id}`,
+            type: "error",
+            title: "expenseAlertTitle",
+            message: "expenseAlertMsg",
+            cropName: crop.cropName,
+            color: "rose",
+            icon: "Banknote"
+           });
+        }
       }
 
       if (crop.activityCount > maxActivities) {
@@ -141,12 +191,39 @@ const getDashboard = async (req, res) => {
         status: crop.status,
         totalExpenses: crop.totalExpenses || 0,
         totalHarvestValue: crop.totalHarvestValue || 0,
+        estimatedRevenue: crop.estimatedRevenue || 0,
         netEstimate,
         activityCount: crop.activityCount,
         needsAttention: crop.status === "active" ? needsAttention : false,
         attentionReason: crop.status === "active" ? attentionReason : []
       };
     });
+
+    // Simulated Weather Alerts
+    if (activeCropsCount > 0) {
+      const weatherRoll = Math.random();
+      if (weatherRoll > 0.85) {
+        smartAlerts.push({
+          id: `wea-rain-${Date.now()}`,
+          type: "warning",
+          title: "weatherRainTitle",
+          message: "weatherRainMsg",
+          cropName: null,
+          color: "blue",
+          icon: "CloudRain"
+        });
+      } else if (weatherRoll < 0.15) {
+        smartAlerts.push({
+          id: `wea-heat-${Date.now()}`,
+          type: "warning",
+          title: "weatherHeatTitle",
+          message: "weatherHeatMsg",
+          cropName: null,
+          color: "orange",
+          icon: "ThermometerSun"
+        });
+      }
+    }
 
     const refinedAnalytics = cropAnalytics.map(crop => ({
       ...crop,
@@ -165,6 +242,7 @@ const getDashboard = async (req, res) => {
       recentActivities,
       latestExpenses,
       upcomingHarvests,
+      smartAlerts,
       analytics: {
         cropAnalytics: refinedAnalytics,
         cropsNeedingAttention

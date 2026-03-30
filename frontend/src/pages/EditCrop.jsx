@@ -18,6 +18,7 @@ function EditCrop() {
     areaUnit: "sqm",
     plantedDate: "",
     expectedHarvestDate: "",
+    estimatedRevenue: "",
     actualHarvestDate: "",
     status: "active",
     notes: "",
@@ -42,6 +43,7 @@ function EditCrop() {
           expectedHarvestDate: crop.expectedHarvestDate
             ? crop.expectedHarvestDate.slice(0, 10)
             : "",
+          estimatedRevenue: crop.estimatedRevenue || "",
           actualHarvestDate: crop.actualHarvestDate ? crop.actualHarvestDate.slice(0, 10) : "",
           status: crop.status || "active",
           notes: crop.notes || "",
@@ -73,6 +75,7 @@ function EditCrop() {
       await updateCrop(id, {
         ...formData,
         area: formData.area ? Number(formData.area) : 0,
+        estimatedRevenue: formData.estimatedRevenue ? Number(formData.estimatedRevenue) : 0,
         actualHarvestDate: formData.actualHarvestDate || null,
       });
 
@@ -195,6 +198,23 @@ function EditCrop() {
                 className="w-full rounded-2xl border border-white/60 bg-white/50 px-4 py-3 text-base text-slate-900 shadow-sm outline-none backdrop-blur-sm transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700/60 dark:bg-slate-800/50 dark:text-slate-100 dark:focus:border-emerald-500 dark:focus:bg-slate-800"
                 required
               />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                {t("estRevenueLabel", "Estimated Revenue (optional)")}
+              </label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-[45%] font-bold text-slate-400">₱</span>
+                <input
+                  type="number"
+                  name="estimatedRevenue"
+                  value={formData.estimatedRevenue}
+                  onChange={handleChange}
+                  placeholder="0"
+                  className="w-full rounded-2xl border border-white/60 bg-white/50 py-3 pl-8 pr-4 text-base text-slate-900 shadow-sm outline-none backdrop-blur-sm transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700/60 dark:bg-slate-800/50 dark:text-slate-100 dark:focus:border-emerald-500 dark:focus:bg-slate-800"
+                />
+              </div>
             </div>
 
             <div>

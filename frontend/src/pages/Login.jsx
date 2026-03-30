@@ -14,8 +14,8 @@ function Login() {
     email: "",
     password: "",
   });
-
   const [error, setError] = useState("");
+  const [slowLoad, setSlowLoad] = useState(false);
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -27,8 +27,15 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setSlowLoad(false);
+
+    // If request takes longer than 3 seconds, Render is likely waking up
+    const timeoutId = setTimeout(() => setSlowLoad(true), 3000);
 
     const result = await login(formData);
+
+    clearTimeout(timeoutId);
+    setSlowLoad(false);
 
     if (result.success) {
       navigate("/dashboard");
@@ -98,6 +105,12 @@ function Login() {
           >
             {loading ? t("loading") : t("loginBtn")}
           </button>
+          
+          {slowLoad && loading && (
+            <p className="animate-pulse text-center text-sm font-medium text-amber-600 dark:text-amber-500">
+              Waking up secure server... this can take up to 45 seconds.
+            </p>
+          )}
         </form>
 
         <p className="mt-4 text-sm text-slate-600 dark:text-slate-400">

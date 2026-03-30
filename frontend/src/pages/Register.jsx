@@ -18,6 +18,7 @@ function Register() {
   });
 
   const [error, setError] = useState("");
+  const [slowLoad, setSlowLoad] = useState(false);
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -29,17 +30,23 @@ function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setSlowLoad(false);
 
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
       return;
     }
 
+    const timeoutId = setTimeout(() => setSlowLoad(true), 3000);
+
     const result = await register({
       name: formData.name,
       email: formData.email,
       password: formData.password,
     });
+
+    clearTimeout(timeoutId);
+    setSlowLoad(false);
 
     if (result.success) {
       navigate("/dashboard");
@@ -137,6 +144,12 @@ function Register() {
           >
             {loading ? t("loading") : t("registerHere")}
           </button>
+          
+          {slowLoad && loading && (
+            <p className="animate-pulse text-center text-sm font-medium text-amber-600 dark:text-amber-500">
+              Waking up secure server... this can take up to 45 seconds.
+            </p>
+          )}
         </form>
 
         <p className="mt-4 text-sm text-slate-600 dark:text-slate-400">
