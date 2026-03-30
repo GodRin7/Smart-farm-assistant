@@ -4,7 +4,8 @@ import MobileLayout from "../components/MobileLayout";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { useTranslation } from "../context/TranslationContext";
-import { LogOut, User, Mail, Globe, Palette, Loader2, FileBarChart, ChevronRight } from "lucide-react";
+import { LogOut, User, Mail, Globe, Palette, Loader2, FileBarChart, ChevronRight, CalendarDays, BarChart3, ClipboardList } from "lucide-react";
+import { Link } from "react-router-dom";
 
 function Profile() {
   const { user, logout, updatePreferences } = useAuth();
@@ -140,6 +141,27 @@ function Profile() {
                 {theme === "light" ? t("themeLight") : t("themeDark")}
               </span>
             </button>
+          </div>
+        </div>
+
+        {/* Quick Links */}
+        <div className="overflow-hidden rounded-[2rem] border border-white/40 bg-white/70 p-5 shadow-sm backdrop-blur-xl dark:border-slate-800/50 dark:bg-slate-900/50">
+          <h2 className="mb-4 text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Tools</h2>
+          <div className="space-y-2">
+            {[
+              { to: "/analytics", label: "Analytics & Charts", icon: BarChart3, color: "text-blue-500" },
+              { to: "/calendar", label: "Farm Calendar", icon: CalendarDays, color: "text-emerald-500" },
+              { to: "/harvests", label: t("myHarvests"), icon: ClipboardList, color: "text-amber-500" },
+              { to: "/reports", label: t("reportsTitle"), icon: FileBarChart, color: "text-violet-500" },
+            ].map(({ to, label, icon: Icon, color }) => (
+              <Link key={to} to={to} className="flex w-full items-center justify-between rounded-2xl bg-slate-50 p-4 transition-colors hover:bg-slate-100 dark:bg-[#0f172a]/50 dark:hover:bg-[#0f172a]/80">
+                <div className="flex items-center gap-3">
+                  <Icon size={20} className={color} />
+                  <span className="font-semibold text-slate-700 dark:text-slate-200">{label}</span>
+                </div>
+                <ChevronRight size={18} className="text-slate-400" />
+              </Link>
+            ))}
           </div>
         </div>
 

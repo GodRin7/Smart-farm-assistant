@@ -17,6 +17,7 @@ import AddHarvest from "../pages/AddHarvest";
 import Reports from "../pages/Reports";
 import FarmCalendar from "../pages/FarmCalendar";
 import AddTask from "../pages/AddTask";
+import Analytics from "../pages/Analytics";
 
 function Router() {
   return (
@@ -134,6 +135,7 @@ function Router() {
           <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
           <Route path="/calendar" element={<ProtectedRoute><FarmCalendar /></ProtectedRoute>} />
           <Route path="/calendar/add" element={<ProtectedRoute><AddTask /></ProtectedRoute>} />
+          <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   );
